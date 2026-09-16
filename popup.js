@@ -44,6 +44,25 @@ document.addEventListener("DOMContentLoaded", async () => {
   autoOrganizeCheck.addEventListener("change", saveSettings);
   notifyCheck.addEventListener("change", saveSettings);
 
+  const destCard = document.getElementById("destCard");
+  const destFolder = document.getElementById("destFolder");
+  const destSubfolder = document.getElementById("destSubfolder");
+
+  const updateDestinationUI = (folder, subfolder) => {
+    if (folder && subfolder) {
+      destFolder.textContent = folder;
+      destSubfolder.textContent = subfolder;
+      destCard.style.display = "block";
+    }
+  };
+
+  // Restore cached target on load
+  chrome.storage.local.get(["lastFolder", "lastSubfolder"], (data) => {
+    if (data && data.lastFolder && data.lastSubfolder) {
+      updateDestinationUI(data.lastFolder, data.lastSubfolder);
+    }
+  });
+
   // Sync Manually & Autonomous Auto-Click Handler
   const performSync = (isAuto = false) => {
     organizeBtn.disabled = true;
@@ -58,7 +77,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       if (response && response.success) {
         resultMsg.style.color = "var(--success)";
-        if (response.lastDestination) {
+        if (response.lastFolder && response.lastSubfolder) {
+          updateDestinationUI(response.lastFolder, response.lastSubfolder);
+          resultMsg.textContent = `✔ Pushed to folder: ${response.lastFolder} / subfolder: ${response.lastSubfolder}`;
+        } else if (response.lastDestination) {
           resultMsg.textContent = `✔ Pushed to ${response.lastDestination}`;
         } else if (response.count > 0) {
           resultMsg.textContent = `✔ Pushed ${response.count} bookmarks to subfolders!`;

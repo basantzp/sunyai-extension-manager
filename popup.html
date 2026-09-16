@@ -107,6 +107,49 @@
       word-break: break-word;
       line-height: 1.35;
     }
+    /* Destination Target Card */
+    .dest-card {
+      margin-top: 8px;
+      padding: 7px 10px;
+      background: #141416;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: 6px;
+      font-size: 11px;
+    }
+    .dest-badge {
+      font-size: 9.5px;
+      font-weight: 700;
+      color: #10b981;
+      letter-spacing: 0.4px;
+      margin-bottom: 4px;
+    }
+    .dest-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 6px;
+      margin-top: 2px;
+    }
+    .dest-label {
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 500;
+    }
+    .dest-value {
+      font-weight: 600;
+      color: var(--text);
+      text-align: right;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 190px;
+    }
+    .dest-value.folder {
+      color: #38bdf8;
+    }
+    .dest-value.subfolder {
+      color: #34d399;
+    }
     /* Hidden Settings Panel */
     .settings-panel {
       display: none;
@@ -203,7 +246,18 @@
   </button>
   <div class="result-msg" id="resultMsg"></div>
 
-  <!-- Hidden Settings Panel (Collapsible via ⚙️) -->
+  <!-- Real-Time Destination Card on Tool UI -->
+  <div class="dest-card" id="destCard" style="display: none;">
+    <div class="dest-badge">⚡ LAST PUSHED TARGET</div>
+    <div class="dest-row">
+      <span class="dest-label">Folder:</span>
+      <span class="dest-value folder" id="destFolder">-</span>
+    </div>
+    <div class="dest-row">
+      <span class="dest-label">Subfolder:</span>
+      <span class="dest-value subfolder" id="destSubfolder">-</span>
+    </div>
+  </div>
   <div class="settings-panel" id="settingsPanel">
     <div class="form-group">
       <label for="apiKey">OpenRouter Key (Optional)</label>

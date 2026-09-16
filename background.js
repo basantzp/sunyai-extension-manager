@@ -36,6 +36,18 @@ let lastTaxonomyRefresh = 0;
 
 async function showInPageToast(catName, subName) {
   try {
+    // Also update browser toolbar tool icon
+    if (chrome.action) {
+      try {
+        chrome.action.setTitle({ title: `sunyai: Pushed to folder ${catName} / subfolder ${subName}` });
+        chrome.action.setBadgeText({ text: "✓" });
+        chrome.action.setBadgeBackgroundColor({ color: "#10b981" });
+        setTimeout(() => {
+          chrome.action.setBadgeText({ text: "" });
+        }, 3500);
+      } catch (e) {}
+    }
+
     const tabs = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
     const tab = tabs[0];
     if (!tab || !tab.id || !tab.url || tab.url.startsWith("chrome://") || tab.url.startsWith("brave://") || tab.url.startsWith("edge://")) {
@@ -44,7 +56,7 @@ async function showInPageToast(catName, subName) {
 
     await chrome.scripting.executeScript({
       target: { tabId: tab.id },
-      func: (destinationText) => {
+      func: (cat, sub) => {
         const oldToast = document.getElementById("__sunyai_sync_toast__");
         if (oldToast) oldToast.remove();
 
@@ -53,8 +65,11 @@ async function showInPageToast(catName, subName) {
         toast.innerHTML = `
           <div style="display: flex; align-items: center; gap: 8px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 12px; line-height: 1;">
             <div style="display: flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%; background: #10b981; color: #09090b; font-size: 11px; font-weight: 800;">⚡</div>
-            <span style="color: #a1a1aa; font-weight: 500;">Pushed to</span>
-            <span style="color: #34d399; font-weight: 700;">${destinationText}</span>
+            <span style="color: #a1a1aa; font-weight: 500;">Pushed to folder</span>
+            <span style="color: #38bdf8; font-weight: 700;">${cat}</span>
+            <span style="color: #71717a; font-weight: 600;">/</span>
+            <span style="color: #a1a1aa; font-weight: 500;">subfolder</span>
+            <span style="color: #34d399; font-weight: 700;">${sub}</span>
           </div>
         `;
 
@@ -90,7 +105,7 @@ async function showInPageToast(catName, subName) {
           }, 300);
         }, 2200);
       },
-      args: [`${catName} › ${subName}`]
+      args: [catName, subName]
     });
   } catch (err) {
     // Fail gracefully on restricted or system tabs
@@ -228,6 +243,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       sendResponse({
         success: true,
         count: res.count,
+        lastFolder: res.lastFolder,
+        lastSubfolder: res.lastSubfolder,
         lastDestination: res.lastDestination,
         destinations: res.destinations
       });
@@ -847,7 +864,7 @@ async function organizeSingleBookmark(bookmark, settings) {
 
   // Check if bookmark is already in target subfolder
   if (bookmark.parentId === subId) {
-    return { moved: false, destination: `${catName} › ${subName}` };
+    return { moved: false, folder: catName, subfolder: subName, destination: `${catName} / ${subName}` };
   }
 
   // 4. Move bookmark autonomously (< 2ms)
@@ -857,7 +874,7 @@ async function organizeSingleBookmark(bookmark, settings) {
 
   console.log(`[sunyai] ⚡ Pushed: "${bookmark.title}" -> [${catName}] > [${subName}]`);
 
-  // 5. In-Page visual confirmation pill
+  // 5. In-Page visual confirmation pill & toolbar title
   await showInPageToast(catName, subName);
 
   // 6. Check destination folder for overcrowding
@@ -870,7 +887,7 @@ async function organizeSingleBookmark(bookmark, settings) {
     }
   } catch (e) {}
 
-  return { moved: true, destination: `${catName} › ${subName}` };
+  return { moved: true, folder: catName, subfolder: subName, destination: `${catName} / ${subName}` };
 }
 
 // ---------------------------------------------------------------------------
@@ -879,11 +896,13 @@ async function organizeSingleBookmark(bookmark, settings) {
 
 async function sweepLooseBookmarks() {
   const settings = await chrome.storage.local.get(DEFAULT_SETTINGS);
-  if (!settings.autoOrganize) return { count: 0, lastDestination: null, destinations: [] };
+  if (!settings.autoOrganize) return { count: 0, lastFolder: null, lastSubfolder: null, lastDestination: null, destinations: [] };
 
   const taxonomyData = await refreshTaxonomy();
   const { rootIds, topCategoryIds, subfolderIds } = taxonomyData;
   let count = 0;
+  let lastFolder = null;
+  let lastSubfolder = null;
   let lastDestination = null;
   const destinations = [];
 
@@ -895,6 +914,8 @@ async function sweepLooseBookmarks() {
           const res = await organizeSingleBookmark(item, settings);
           if (res && res.moved) {
             count++;
+            lastFolder = res.folder;
+            lastSubfolder = res.subfolder;
             lastDestination = res.destination;
             destinations.push(res.destination);
           }
@@ -926,6 +947,8 @@ async function sweepLooseBookmarks() {
               const res = await organizeSingleBookmark(subItem, settings);
               if (res && res.moved) {
                 count++;
+                lastFolder = res.folder;
+                lastSubfolder = res.subfolder;
                 lastDestination = res.destination;
                 destinations.push(res.destination);
               }
@@ -943,10 +966,12 @@ async function sweepLooseBookmarks() {
   if (count > 0) {
     await chrome.storage.local.set({
       lastOrganizedCount: count,
+      lastFolder: lastFolder || "",
+      lastSubfolder: lastSubfolder || "",
       lastDestination: lastDestination || "",
       lastRun: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     });
   }
 
-  return { count, lastDestination, destinations };
+  return { count, lastFolder, lastSubfolder, lastDestination, destinations };
 }
