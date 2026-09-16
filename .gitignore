@@ -1,0 +1,6 @@
+target/
+native-engine/target/
+*.tmp
+*.bak
+*.bak*
+.DS_Store

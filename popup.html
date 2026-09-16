@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>sunyai bookmark organizer</title>
+  <style>
+    :root {
+      --bg: #09090b;
+      --card: #18181b;
+      --border: #27272a;
+      --accent: #f97316;
+      --accent-hover: #ea580c;
+      --text: #f4f4f5;
+      --muted: #a1a1aa;
+      --success: #10b981;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    body {
+      width: 285px;
+      background: var(--bg);
+      color: var(--text);
+      padding: 12px;
+      font-size: 12px;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--text);
+    }
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10.5px;
+      color: var(--success);
+      font-weight: 500;
+    }
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 6px var(--success);
+    }
+    .settings-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 13px;
+      padding: 2px 4px;
+      border-radius: 4px;
+      transition: color 0.15s;
+    }
+    .settings-btn:hover {
+      color: var(--text);
+    }
+    /* Main Sync Manually Button */
+    .btn-sync {
+      width: 100%;
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 14px rgba(249, 115, 22, 0.25);
+      transition: all 0.15s ease;
+    }
+    .btn-sync:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+    .btn-sync:active {
+      transform: translateY(0);
+    }
+    .btn-sync:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .result-msg {
+      font-size: 11px;
+      text-align: center;
+      margin-top: 7px;
+      min-height: 16px;
+      font-weight: 600;
+      word-break: break-word;
+      line-height: 1.35;
+    }
+    /* Hidden Settings Panel */
+    .settings-panel {
+      display: none;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+    .settings-panel.open {
+      display: block;
+    }
+    .form-group {
+      margin-bottom: 8px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 10.5px;
+      color: var(--muted);
+      margin-bottom: 3px;
+    }
+    input[type="text"], select {
+      width: 100%;
+      background: #141416;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 8px;
+      border-radius: 5px;
+      font-size: 11px;
+      outline: none;
+    }
+    input[type="text"]:focus, select:focus {
+      border-color: var(--accent);
+    }
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 6px;
+      font-size: 11px;
+    }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 30px;
+      height: 16px;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #3f3f46;
+      transition: .2s;
+      border-radius: 16px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 12px;
+      width: 12px;
+      left: 2px;
+      bottom: 2px;
+      background-color: white;
+      transition: .2s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: var(--accent);
+    }
+    input:checked + .slider:before {
+      transform: translateX(14px);
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-left">
+      <span>⚡</span>
+      <span style="font-size: 12.5px; font-weight: 700; letter-spacing: -0.2px;">sunyai bookmark organizer</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <div class="status-badge"><div class="dot"></div> Active</div>
+      <button class="settings-btn" id="settingsToggle" title="Settings">⚙️</button>
+    </div>
+  </div>
+
+  <!-- Primary Action: Only Sync Manually -->
+  <button class="btn-sync" id="organizeBtn">
+    <span id="btnIcon">⚡</span>
+    <span id="btnText">Sync Manually</span>
+  </button>
+  <div class="result-msg" id="resultMsg"></div>
+
+  <!-- Hidden Settings Panel (Collapsible via ⚙️) -->
+  <div class="settings-panel" id="settingsPanel">
+    <div class="form-group">
+      <label for="apiKey">OpenRouter Key (Optional)</label>
+      <input type="text" id="apiKey" placeholder="Leave empty for Zero-API mode">
+    </div>
+    <div class="form-group">
+      <label for="model">AI Model</label>
+      <select id="model">
+        <option value="z-ai/glm-5.2:free">z-ai/glm-5.2:free</option>
+        <option value="nvidia/nemotron-3.5-lightning:free">nvidia/nemotron-3.5-lightning:free</option>
+        <option value="google/gemma-4-31b-it:free">google/gemma-4-31b-it:free</option>
+        <option value="liquid/lfm-2.5-2.6b:free">liquid/lfm-2.5-2.6b:free</option>
+      </select>
+    </div>
+    <div class="toggle-row">
+      <span>Auto-organize on save</span>
+      <label class="switch">
+        <input type="checkbox" id="autoOrganize" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+    <div class="toggle-row">
+      <span>Desktop notification</span>
+      <label class="switch">
+        <input type="checkbox" id="notify" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
