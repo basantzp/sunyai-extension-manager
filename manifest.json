@@ -1,15 +1,16 @@
 {
   "manifest_version": 3,
   "name": "sunyai bookmark organizer",
-  "version": "1.1.0",
-  "description": "Instantly and autonomously organizes bookmarks into intelligent categories and subfolders with zero battery drain.",
+  "version": "1.2.0",
+  "description": "Autonomous bookmark organizer with Nepali-aware smart folders. Sub-millisecond, zero battery drain.",
   "permissions": [
     "bookmarks",
     "storage",
     "alarms",
     "notifications",
     "activeTab",
-    "scripting"
+    "scripting",
+    "windows"
   ],
   "host_permissions": [
     "https://openrouter.ai/*"
@@ -20,14 +21,14 @@
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
-      "16": "icons/icon16.png",
-      "48": "icons/icon48.png",
+      "16":  "icons/icon16.png",
+      "48":  "icons/icon48.png",
       "128": "icons/icon128.png"
     }
   },
   "icons": {
-    "16": "icons/icon16.png",
-    "48": "icons/icon48.png",
+    "16":  "icons/icon16.png",
+    "48":  "icons/icon48.png",
     "128": "icons/icon128.png"
   }
 }

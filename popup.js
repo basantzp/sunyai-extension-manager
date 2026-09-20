@@ -1,107 +1,124 @@
 document.addEventListener("DOMContentLoaded", async () => {
-  const organizeBtn = document.getElementById("organizeBtn");
-  const btnText = document.getElementById("btnText");
-  const btnIcon = document.getElementById("btnIcon");
-  const resultMsg = document.getElementById("resultMsg");
+  const organizeBtn    = document.getElementById("organizeBtn");
+  const btnText        = document.getElementById("btnText");
+  const btnIcon        = document.getElementById("btnIcon");
+  const resultMsg      = document.getElementById("resultMsg");
   const settingsToggle = document.getElementById("settingsToggle");
-  const settingsPanel = document.getElementById("settingsPanel");
+  const settingsPanel  = document.getElementById("settingsPanel");
 
-  const apiKeyInput = document.getElementById("apiKey");
-  const modelSelect = document.getElementById("model");
+  const apiKeyInput       = document.getElementById("apiKey");
+  const modelSelect       = document.getElementById("model");
   const autoOrganizeCheck = document.getElementById("autoOrganize");
-  const notifyCheck = document.getElementById("notify");
+  const notifyCheck       = document.getElementById("notify");
+
+  const destCard      = document.getElementById("destCard");
+  const destFolder    = document.getElementById("destFolder");
+  const destSubfolder = document.getElementById("destSubfolder");
+  const destTime      = document.getElementById("destTime");
+  const statCount     = document.getElementById("statCount");
+  const statTime      = document.getElementById("statTime");
 
   // Load saved settings
   const settings = await chrome.storage.local.get({
     apiKey: "",
     model: "z-ai/glm-5.2:free",
     autoOrganize: true,
-    notify: true
+    notify: true,
+    lastOrganizedCount: 0,
+    lastRun: null,
+    lastFolder: "",
+    lastSubfolder: ""
   });
 
-  apiKeyInput.value = settings.apiKey || "";
-  modelSelect.value = settings.model || "z-ai/glm-5.2:free";
+  apiKeyInput.value         = settings.apiKey || "";
+  modelSelect.value         = settings.model  || "z-ai/glm-5.2:free";
   autoOrganizeCheck.checked = settings.autoOrganize !== false;
-  notifyCheck.checked = settings.notify !== false;
+  notifyCheck.checked       = settings.notify       !== false;
 
-  // Toggle settings panel visibility
+  // Populate stats
+  if (settings.lastOrganizedCount > 0) {
+    statCount.textContent = settings.lastOrganizedCount;
+  }
+  if (settings.lastRun) {
+    statTime.textContent = settings.lastRun;
+  }
+
+  // Restore last destination card
+  if (settings.lastFolder && settings.lastSubfolder) {
+    showDestination(settings.lastFolder, settings.lastSubfolder, settings.lastRun);
+  }
+
+  // Toggle settings panel
   settingsToggle.addEventListener("click", () => {
     settingsPanel.classList.toggle("open");
+    settingsToggle.textContent = settingsPanel.classList.contains("open") ? "✕" : "⚙️";
   });
 
-  // Auto-save setting changes
+  // Auto-save any settings change
   const saveSettings = () => {
     chrome.storage.local.set({
-      apiKey: apiKeyInput.value.trim(),
-      model: modelSelect.value,
+      apiKey:       apiKeyInput.value.trim(),
+      model:        modelSelect.value,
       autoOrganize: autoOrganizeCheck.checked,
-      notify: notifyCheck.checked
+      notify:       notifyCheck.checked
     });
   };
-
   apiKeyInput.addEventListener("change", saveSettings);
   modelSelect.addEventListener("change", saveSettings);
   autoOrganizeCheck.addEventListener("change", saveSettings);
   notifyCheck.addEventListener("change", saveSettings);
 
-  const destCard = document.getElementById("destCard");
-  const destFolder = document.getElementById("destFolder");
-  const destSubfolder = document.getElementById("destSubfolder");
-
-  const updateDestinationUI = (folder, subfolder) => {
+  // Show destination card
+  function showDestination(folder, subfolder, time) {
     if (folder && subfolder) {
-      destFolder.textContent = folder;
+      destFolder.textContent    = folder;
       destSubfolder.textContent = subfolder;
-      destCard.style.display = "block";
+      destTime.textContent      = time || "";
+      destCard.style.display    = "block";
     }
-  };
+  }
 
-  // Restore cached target on load
-  chrome.storage.local.get(["lastFolder", "lastSubfolder"], (data) => {
-    if (data && data.lastFolder && data.lastSubfolder) {
-      updateDestinationUI(data.lastFolder, data.lastSubfolder);
-    }
-  });
-
-  // Sync Manually & Autonomous Auto-Click Handler
+  // Main sync handler
   const performSync = (isAuto = false) => {
-    organizeBtn.disabled = true;
-    btnText.textContent = "Syncing...";
-    btnIcon.textContent = "⏳";
+    organizeBtn.disabled  = true;
+    btnText.textContent   = "Organizing…";
+    btnIcon.textContent   = "⏳";
     resultMsg.textContent = "";
 
     chrome.runtime.sendMessage({ action: "organize_now" }, (response) => {
       organizeBtn.disabled = false;
-      btnText.textContent = "Sync Manually";
-      btnIcon.textContent = "⚡";
+      btnText.textContent  = "Organize Now";
+      btnIcon.textContent  = "⚡";
 
       if (response && response.success) {
         resultMsg.style.color = "var(--success)";
+        const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
         if (response.lastFolder && response.lastSubfolder) {
-          updateDestinationUI(response.lastFolder, response.lastSubfolder);
-          resultMsg.textContent = `✔ Pushed to folder: ${response.lastFolder} / subfolder: ${response.lastSubfolder}`;
-        } else if (response.lastDestination) {
-          resultMsg.textContent = `✔ Pushed to ${response.lastDestination}`;
+          showDestination(response.lastFolder, response.lastSubfolder, now);
+          resultMsg.textContent = `✓ Saved to ${response.lastFolder} › ${response.lastSubfolder}`;
+          statCount.textContent = response.count || settings.lastOrganizedCount || 0;
+          statTime.textContent  = now;
         } else if (response.count > 0) {
-          resultMsg.textContent = `✔ Pushed ${response.count} bookmarks to subfolders!`;
+          resultMsg.textContent = `✓ Organized ${response.count} bookmark${response.count > 1 ? 's' : ''}!`;
+          statCount.textContent = response.count;
+          statTime.textContent  = now;
         } else {
-          resultMsg.textContent = `✔ Pushed to clean folders!`;
+          resultMsg.textContent = `✓ All bookmarks already organized!`;
+          statTime.textContent  = now;
         }
       } else {
         resultMsg.style.color = "#ef4444";
-        resultMsg.textContent = `Notice: ${response?.error || "Up to date"}`;
+        resultMsg.textContent = `Notice: ${response?.error || "Up to date"}` ;
       }
 
-      setTimeout(() => {
-        resultMsg.textContent = "";
-      }, 4000);
+      // Clear message after 4s
+      setTimeout(() => { resultMsg.textContent = ""; }, 4000);
     });
   };
 
   organizeBtn.addEventListener("click", () => performSync(false));
 
-  // Autonomous Auto-Click on open: immediately execute sync manually!
-  setTimeout(() => {
-    performSync(true);
-  }, 120);
+  // Auto-sync on popup open
+  setTimeout(() => { performSync(true); }, 120);
 });
