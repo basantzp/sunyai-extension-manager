@@ -1,19 +1,32 @@
 /**
- * sunyai bookmark organizer (v3.0)
- *
- * WHAT'S NEW IN v3.0:
- * - Deep YouTube intelligence: Nepali vs English split inside Music, Vlogs, Comedy, etc.
- * - Nepali-language aware: detects Devanagari text, Nepali artists, Nepali news sites
- * - Social media expanded: Reddit, Twitter/X, Instagram, LinkedIn all routed smartly
- * - Shopping upgraded: Daraz, Sastodeal, Hamrobazar, Amazon sub-categories
- * - Education: Nepal universities, online courses, research papers
- * - Health & Fitness as a first-class category
- * - Food & Recipes: Nepali cuisine, international, restaurants
- * - Travel: Nepal destinations, international travel, booking sites
- * - Readable folder names for non-technical users
- * - 15-folder limit (raised from 12)
- * - Overcrowded threshold raised to 8 (avoids over-splitting small folders)
+ * sunyai extension manager (v2.0)
+ * Unified Autonomous Bookmark Organizer & TabFlow Smart Tab Manager
  */
+
+try {
+  importScripts(
+    'src/config/CategoryConfiguration.js',
+    'src/utils/DomainExtractor.js',
+    'src/utils/UrlPatternMatcher.js',
+    'src/utils/ColorGenerator.js',
+    'src/utils/TitleParser.js',
+    'src/utils/Constants.js',
+    'src/services/StateManager.js',
+    'src/services/StorageManager.js',
+    'src/services/TabFocusService.js',
+    'src/services/TabGroupService.js',
+    'src/services/TabGroupService.core.js',
+    'src/services/TabGroupService.helpers.js',
+    'src/services/TabGroupService.operations.js',
+    'src/services/TabGroupService.navigation.js',
+    'src/services/TabGroupService.queries.js',
+    'src/services/GroupManager.js',
+    'src/handlers/MessageHandler.js',
+    'src/app.js'
+  );
+} catch (e) {
+  console.error('[sunyai] Failed to import TabFlow scripts:', e);
+}
 
 const DEFAULT_SETTINGS = {
   apiKey: "",

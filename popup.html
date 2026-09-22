@@ -2,438 +2,440 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>sunyai bookmark organizer</title>
-  <style>
-    :root {
-      --bg: #09090b;
-      --card: #18181b;
-      --border: #27272a;
-      --accent: #f97316;
-      --accent-hover: #ea580c;
-      --text: #f4f4f5;
-      --muted: #a1a1aa;
-      --success: #10b981;
-      --info: #38bdf8;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-
-    body {
-      width: 300px;
-      background: var(--bg);
-      color: var(--text);
-      padding: 14px;
-      font-size: 12px;
-    }
-
-    /* ---- HEADER ---- */
-    .header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 12px;
-    }
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-    }
-    .logo-pill {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 26px;
-      height: 26px;
-      border-radius: 8px;
-      background: linear-gradient(135deg, #f97316, #10b981);
-      font-size: 14px;
-    }
-    .brand {
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: -0.3px;
-      color: var(--text);
-    }
-    .brand span {
-      color: var(--accent);
-    }
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .status-badge {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 10px;
-      color: var(--success);
-      font-weight: 600;
-      background: rgba(16,185,129,0.1);
-      padding: 3px 8px;
-      border-radius: 99px;
-      border: 1px solid rgba(16,185,129,0.25);
-    }
-    .dot {
-      width: 5px; height: 5px;
-      border-radius: 50%;
-      background: var(--success);
-      box-shadow: 0 0 5px var(--success);
-      animation: pulse 2s infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50%       { opacity: 0.4; }
-    }
-    .settings-btn {
-      background: none;
-      border: 1px solid var(--border);
-      color: var(--muted);
-      cursor: pointer;
-      font-size: 13px;
-      padding: 4px 6px;
-      border-radius: 6px;
-      transition: all 0.15s;
-      line-height: 1;
-    }
-    .settings-btn:hover { color: var(--text); border-color: #3f3f46; }
-
-    /* ---- SYNC BUTTON ---- */
-    .btn-sync {
-      width: 100%;
-      background: linear-gradient(135deg, var(--accent), #fb923c);
-      color: white;
-      border: none;
-      padding: 11px 14px;
-      border-radius: 10px;
-      font-weight: 700;
-      font-size: 13px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      box-shadow: 0 4px 20px rgba(249,115,22,0.3);
-      transition: all 0.15s ease;
-      letter-spacing: -0.2px;
-    }
-    .btn-sync:hover  { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(249,115,22,0.4); }
-    .btn-sync:active { transform: translateY(0); }
-    .btn-sync:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
-
-    /* ---- RESULT MESSAGE ---- */
-    .result-msg {
-      font-size: 11px;
-      text-align: center;
-      margin-top: 8px;
-      min-height: 16px;
-      font-weight: 600;
-      word-break: break-word;
-      line-height: 1.4;
-    }
-
-    /* ---- DESTINATION CARD ---- */
-    .dest-card {
-      margin-top: 10px;
-      padding: 9px 12px;
-      background: #111113;
-      border: 1px solid rgba(16,185,129,0.25);
-      border-radius: 8px;
-      font-size: 11px;
-    }
-    .dest-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 6px;
-    }
-    .dest-badge {
-      font-size: 9px;
-      font-weight: 700;
-      color: var(--success);
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-    }
-    .dest-time {
-      font-size: 9px;
-      color: var(--muted);
-    }
-    .dest-row {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 6px;
-      margin-top: 3px;
-    }
-    .dest-label { color: var(--muted); font-size: 10px; white-space: nowrap; }
-    .dest-value {
-      font-weight: 600;
-      text-align: right;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      max-width: 195px;
-    }
-    .dest-value.folder    { color: var(--info); }
-    .dest-value.subfolder { color: #34d399; }
-
-    /* ---- DIVIDER ---- */
-    .divider {
-      height: 1px;
-      background: var(--border);
-      margin: 12px 0;
-    }
-
-    /* ---- QUICK STATS ---- */
-    .stats-row {
-      display: flex;
-      gap: 6px;
-      margin-bottom: 10px;
-    }
-    .stat-pill {
-      flex: 1;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 7px 8px;
-      text-align: center;
-    }
-    .stat-pill .stat-num {
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--accent);
-      line-height: 1;
-    }
-    .stat-pill .stat-label {
-      font-size: 9px;
-      color: var(--muted);
-      margin-top: 2px;
-    }
-
-    /* ---- SETTINGS PANEL ---- */
-    .settings-panel { display: none; }
-    .settings-panel.open { display: block; }
-    .settings-title {
-      font-size: 10.5px;
-      font-weight: 700;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 10px;
-    }
-    .form-group { margin-bottom: 9px; }
-    .form-group label {
-      display: block;
-      font-size: 10.5px;
-      color: var(--muted);
-      margin-bottom: 4px;
-      font-weight: 500;
-    }
-    input[type="text"], select {
-      width: 100%;
-      background: #111113;
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 7px 9px;
-      border-radius: 6px;
-      font-size: 11px;
-      outline: none;
-      transition: border-color 0.15s;
-    }
-    input[type="text"]:focus, select:focus { border-color: var(--accent); }
-
-    /* toggle rows */
-    .toggle-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-top: 7px;
-      font-size: 11.5px;
-      color: var(--text);
-    }
-    .toggle-desc { font-size: 10px; color: var(--muted); margin-top: 1px; }
-    .switch {
-      position: relative;
-      display: inline-block;
-      width: 32px;
-      height: 18px;
-      flex-shrink: 0;
-    }
-    .switch input { opacity: 0; width: 0; height: 0; }
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-color: #3f3f46;
-      transition: .2s;
-      border-radius: 18px;
-    }
-    .slider:before {
-      position: absolute;
-      content: "";
-      height: 14px; width: 14px;
-      left: 2px; bottom: 2px;
-      background-color: white;
-      transition: .2s;
-      border-radius: 50%;
-    }
-    input:checked + .slider { background-color: var(--accent); }
-    input:checked + .slider:before { transform: translateX(14px); }
-
-    /* category preview */
-    .cat-preview {
-      margin-top: 10px;
-      padding: 9px 11px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-    }
-    .cat-preview-title {
-      font-size: 9px;
-      font-weight: 700;
-      color: var(--muted);
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      margin-bottom: 7px;
-    }
-    .cat-list { display: flex; flex-wrap: wrap; gap: 4px; }
-    .cat-tag {
-      font-size: 9.5px;
-      padding: 2px 7px;
-      border-radius: 99px;
-      background: #1a1a1d;
-      border: 1px solid var(--border);
-      color: var(--muted);
-    }
-
-    /* footer */
-    .footer {
-      margin-top: 10px;
-      font-size: 9.5px;
-      color: #52525b;
-      text-align: center;
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>sunyai extension manager</title>
+  <link rel="stylesheet" href="popup.css">
 </head>
 <body>
-
-  <!-- HEADER -->
-  <div class="header">
-    <div class="header-left">
-      <div class="logo-pill">⚡</div>
-      <div>
-        <div class="brand">sunyai <span>organizer</span></div>
+  <div class="popup-container">
+    <!-- Header -->
+    <div class="header">
+      <div class="header-left">
+        <div class="logo-pill">⚡</div>
+        <div class="brand">sunyai <span>flow</span></div>
+      </div>
+      <div class="tab-nav">
+        <button class="tab-btn active" data-tab="home" id="tabNavTabs">Tabs</button>
+        <button class="tab-btn" data-tab="bookmarks" id="tabNavBookmarks">Bookmarks</button>
+        <button class="tab-btn" data-tab="settings" id="tabNavSettings">Settings</button>
       </div>
     </div>
-    <div class="header-right">
-      <div class="status-badge"><div class="dot"></div> Active</div>
-      <button class="settings-btn" id="settingsToggle" title="Settings">⚙️</button>
+
+    <!-- Status banner -->
+    <div id="status"></div>
+
+    <!-- Tab Search Bar (Active on Tabs tab) -->
+    <div class="search-bar" id="searchBar">
+      <div class="search-input-wrapper">
+        <span class="search-icon">&#128269;</span>
+        <input type="text" id="searchInput" placeholder="Search tabs... (/ or i, Esc to exit)" autocomplete="off">
+      </div>
+    </div>
+
+    <!-- 1. TABS VIEW -->
+    <div class="tab-content active" id="homeTab">
+      <div class="home-header">
+        <span class="home-title">Active Tabs &amp; Groups</span>
+        <div class="toggle-wrapper">
+          <button class="btn btn-ghost btn-sm" id="expandAllBtn" title="Expand/Collapse All Groups">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+          </button>
+          <label class="switch" title="Auto-Group Tabs">
+            <input type="checkbox" id="groupToggle">
+            <span class="switch-slider"></span>
+          </label>
+        </div>
+      </div>
+      <div class="content" id="mainContent">
+        <div id="groupsList"></div>
+        <div class="search-results" id="searchResults"></div>
+      </div>
+    </div>
+
+    <!-- 2. BOOKMARKS VIEW -->
+    <div class="tab-content" id="bookmarksTab">
+      <div class="bookmarks-view-container">
+        <!-- Hero Organize Button -->
+        <button class="btn-sync" id="organizeBtn">
+          <span id="btnIcon">⚡</span>
+          <span id="btnText">Organize Now</span>
+        </button>
+        <div class="result-msg" id="resultMsg"></div>
+
+        <!-- Real-Time Destination Card -->
+        <div class="dest-card" id="destCard" style="display: none;">
+          <div class="dest-badge">
+            <span>⚡ LAST PUSHED TARGET</span>
+            <span class="dest-time" id="destTime"></span>
+          </div>
+          <div class="dest-row">
+            <span class="dest-label">Folder:</span>
+            <span class="dest-value folder" id="destFolder">-</span>
+          </div>
+          <div class="dest-row">
+            <span class="dest-label">Subfolder:</span>
+            <span class="dest-value subfolder" id="destSubfolder">-</span>
+          </div>
+        </div>
+
+        <!-- Stats Row -->
+        <div class="stats-row">
+          <div class="stat-chip">
+            <span class="stat-num" id="statCount">0</span>
+            <span class="stat-label">Bookmarks Sorted</span>
+          </div>
+          <div class="stat-chip">
+            <span class="stat-num" id="statTime">Active</span>
+            <span class="stat-label">Engine Latency: &lt;1ms</span>
+          </div>
+        </div>
+
+        <!-- Category Matrix Header & Chips -->
+        <div class="category-chips-header">Smart Taxonomy Categories</div>
+        <div class="category-chips">
+          <span class="chip">🇳🇵 Nepal News</span>
+          <span class="chip">📈 NEPSE &amp; Finance</span>
+          <span class="chip">🎵 Nepali &amp; Global Music</span>
+          <span class="chip">🤖 AI &amp; LLMs</span>
+          <span class="chip">💻 Dev Tools</span>
+          <span class="chip">🎓 Education</span>
+          <span class="chip">💼 Career</span>
+          <span class="chip">🛒 Shopping</span>
+          <span class="chip">💪 Health &amp; Fitness</span>
+          <span class="chip">✈️ Travel &amp; Trekking</span>
+          <span class="chip">🍜 Food &amp; Recipes</span>
+          <span class="chip">🎨 Design</span>
+          <span class="chip">🎬 Cinema &amp; Docs</span>
+          <span class="chip">🌐 Social Media</span>
+          <span class="chip">🛠️ Web Tools</span>
+        </div>
+
+        <!-- Bookmark Settings Toggle Drawer -->
+        <div style="display: flex; justify-content: flex-end; margin-top: 6px;">
+          <button class="btn btn-ghost btn-sm" id="bookmarkSettingsToggle" style="font-size: 11px; color: var(--text-muted);">
+            ⚙️ AI &amp; Sync Preferences
+          </button>
+        </div>
+
+        <div class="bookmark-drawer" id="bookmarkSettingsPanel">
+          <div class="form-group">
+            <label for="apiKey" style="font-size: 11px;">OpenRouter API Key (Optional)</label>
+            <input type="text" id="apiKey" placeholder="Leave blank for local zero-API mode">
+          </div>
+          <div class="form-group">
+            <label for="model" style="font-size: 11px;">AI Model</label>
+            <select id="model" style="background: var(--bg-primary); border: 1px solid var(--border-color); color: var(--text-primary); padding: 6px; border-radius: var(--radius-sm); font-size: 11px;">
+              <option value="z-ai/glm-5.2:free">z-ai/glm-5.2:free</option>
+              <option value="nvidia/nemotron-3.5-lightning:free">nvidia/nemotron-3.5-lightning:free</option>
+              <option value="google/gemma-4-31b-it:free">google/gemma-4-31b-it:free</option>
+            </select>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px;">
+            <span>Auto-organize on save</span>
+            <label class="switch">
+              <input type="checkbox" id="autoOrganize" checked>
+              <span class="switch-slider"></span>
+            </label>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px;">
+            <span>Desktop notification</span>
+            <label class="switch">
+              <input type="checkbox" id="notify" checked>
+              <span class="switch-slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. SETTINGS & RULES VIEW -->
+    <div class="tab-content" id="settingsTab">
+      <div class="settings-content">
+        <!-- Tab Groups CRUD Section -->
+        <div class="settings-section">
+          <div class="section-header">
+            <div class="section-title">
+              <svg class="section-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                <line x1="12" y1="11" x2="12" y2="17"/>
+                <line x1="9" y1="14" x2="15" y2="14"/>
+              </svg>
+              <h3>Tab Domain Rules</h3>
+            </div>
+            <button class="btn btn-primary btn-sm" id="addGroupBtn">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+              New Group
+            </button>
+          </div>
+          <div id="configGroupsList"></div>
+        </div>
+
+        <!-- General Automation Settings -->
+        <div class="settings-section">
+          <div class="section-header">
+            <div class="section-title">
+              <svg class="section-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+              </svg>
+              <h3>General Automation</h3>
+            </div>
+          </div>
+
+          <div class="settings-actions">
+            <!-- Side Panel Mode Toggle -->
+            <div class="settings-toggle-card">
+              <div class="toggle-card-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                  <line x1="8" y1="21" x2="16" y2="21"/>
+                  <line x1="12" y1="17" x2="12" y2="21"/>
+                </svg>
+              </div>
+              <div class="toggle-card-content">
+                <div class="toggle-card-info">
+                  <span class="toggle-card-title">Side Panel Mode</span>
+                  <span class="toggle-card-desc">Open sunyai extension manager in the browser sidebar</span>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="uiModeToggle">
+                  <span class="switch-slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Prevent Duplicate Tabs -->
+            <div class="settings-toggle-card">
+              <div class="toggle-card-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                  <line x1="9" y1="9" x2="15" y2="15"/>
+                  <line x1="15" y1="9" x2="9" y2="15"/>
+                </svg>
+              </div>
+              <div class="toggle-card-content">
+                <div class="toggle-card-info">
+                  <span class="toggle-card-title">Prevent Duplicate Tabs</span>
+                  <span class="toggle-card-desc">Auto-focus existing tabs instead of opening duplicates</span>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="duplicatePreventionToggle">
+                  <span class="switch-slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Group Unlisted Tabs -->
+            <div class="settings-toggle-card">
+              <div class="toggle-card-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                </svg>
+              </div>
+              <div class="toggle-card-content">
+                <div class="toggle-card-info">
+                  <span class="toggle-card-title">Group Unlisted Tabs</span>
+                  <span class="toggle-card-desc">Create OTHERS group for tabs not matching any rule</span>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="groupUnlistedToggle">
+                  <span class="switch-slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Auto-Collapse Inactive Groups -->
+            <div class="settings-toggle-card">
+              <div class="toggle-card-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="4 14 10 14 10 20"/>
+                  <polyline points="20 10 14 10 14 4"/>
+                  <line x1="14" y1="10" x2="21" y2="3"/>
+                  <line x1="3" y1="21" x2="10" y2="14"/>
+                </svg>
+              </div>
+              <div class="toggle-card-content">
+                <div class="toggle-card-info">
+                  <span class="toggle-card-title">Auto-Collapse Groups</span>
+                  <span class="toggle-card-desc">Automatically collapse inactive tab groups</span>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="autoCollapseToggle">
+                  <span class="switch-slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Tab Group Display Mode -->
+            <div class="settings-toggle-card">
+              <div class="toggle-card-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                  <line x1="8" y1="21" x2="16" y2="21"/>
+                  <line x1="12" y1="17" x2="12" y2="21"/>
+                </svg>
+              </div>
+              <div class="toggle-card-content">
+                <div class="toggle-card-info">
+                  <span class="toggle-card-title">Tab Group Display Mode</span>
+                  <span class="toggle-card-desc">Choose how tab group titles are formatted</span>
+                </div>
+                <select id="displayModeSelect" class="display-mode-select">
+                  <option value="icon+name+count">Icon + Name + Count</option>
+                  <option value="icon+name">Icon + Name</option>
+                  <option value="icon+count">Icon + Count</option>
+                  <option value="icon-only">Icon Only</option>
+                  <option value="name+count">Name + Count</option>
+                  <option value="name-only">Name Only</option>
+                  <option value="count-only">Count Only</option>
+                  <option value="count">Count</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="settings-divider"></div>
+
+            <button class="settings-action-btn" id="sortNowBtn">
+              <div class="action-btn-content">
+                <svg class="action-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="12" y1="5" x2="12" y2="19"/>
+                  <polyline points="19 12 12 19 5 12"/>
+                </svg>
+                <div class="action-btn-info">
+                  <span class="action-btn-title">Sort Tabs Now</span>
+                  <span class="action-btn-desc">Group all open tabs by domain rules</span>
+                </div>
+              </div>
+            </button>
+
+            <button class="settings-action-btn" id="ungroupBtn">
+              <div class="action-btn-content">
+                <svg class="action-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="12" y1="19" x2="12" y2="5"/>
+                  <polyline points="5 12 12 5 19 12"/>
+                </svg>
+                <div class="action-btn-info">
+                  <span class="action-btn-title">Ungroup All Tabs</span>
+                  <span class="action-btn-desc">Remove all tab groupings</span>
+                </div>
+              </div>
+            </button>
+
+            <div class="settings-divider"></div>
+
+            <button class="settings-action-btn danger" id="resetGroupsBtn">
+              <div class="action-btn-content">
+                <svg class="action-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="1 4 1 10 7 10"/>
+                  <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+                </svg>
+                <div class="action-btn-info">
+                  <span class="action-btn-title">Reset to Defaults</span>
+                  <span class="action-btn-desc">Restore original Nepali &amp; global group configurations</span>
+                </div>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- QUICK STATS -->
-  <div class="stats-row">
-    <div class="stat-pill">
-      <div class="stat-num" id="statCount">—</div>
-      <div class="stat-label">organized</div>
-    </div>
-    <div class="stat-pill">
-      <div class="stat-num" id="statTime">—</div>
-      <div class="stat-label">last sync</div>
-    </div>
-    <div class="stat-pill">
-      <div class="stat-num">v3</div>
-      <div class="stat-label">version</div>
-    </div>
-  </div>
-
-  <!-- SYNC BUTTON -->
-  <button class="btn-sync" id="organizeBtn">
-    <span id="btnIcon">⚡</span>
-    <span id="btnText">Organize Now</span>
-  </button>
-  <div class="result-msg" id="resultMsg"></div>
-
-  <!-- LAST DESTINATION CARD -->
-  <div class="dest-card" id="destCard" style="display:none;">
-    <div class="dest-header">
-      <span class="dest-badge">⚡ Last Saved To</span>
-      <span class="dest-time" id="destTime"></span>
-    </div>
-    <div class="dest-row">
-      <span class="dest-label">Folder</span>
-      <span class="dest-value folder" id="destFolder">—</span>
-    </div>
-    <div class="dest-row">
-      <span class="dest-label">Subfolder</span>
-      <span class="dest-value subfolder" id="destSubfolder">—</span>
-    </div>
-  </div>
-
-  <!-- SETTINGS PANEL -->
-  <div class="settings-panel" id="settingsPanel">
-    <div class="divider"></div>
-    <div class="settings-title">⚙️ Settings</div>
-
-    <div class="form-group">
-      <label for="apiKey">OpenRouter API Key <span style="color:#52525b;">(optional)</span></label>
-      <input type="text" id="apiKey" placeholder="Leave empty — works without it">
-    </div>
-    <div class="form-group">
-      <label for="model">AI Model</label>
-      <select id="model">
-        <option value="z-ai/glm-5.2:free">z-ai/glm-5.2 (free)</option>
-        <option value="nvidia/nemotron-3.5-lightning:free">nvidia/nemotron-3.5-lightning (free)</option>
-        <option value="google/gemma-4-31b-it:free">google/gemma-4-31b (free)</option>
-        <option value="liquid/lfm-2.5-2.6b:free">liquid/lfm-2.5 (free)</option>
-      </select>
-    </div>
-
-    <div class="toggle-row">
-      <div>
-        <div>Auto-organize on save</div>
-        <div class="toggle-desc">Sorts every new bookmark instantly</div>
+  <!-- Create/Edit Group Modal -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modalTitle">New Group</h3>
+        <button class="modal-close" id="modalClose">&times;</button>
       </div>
-      <label class="switch">
-        <input type="checkbox" id="autoOrganize" checked>
-        <span class="slider"></span>
-      </label>
-    </div>
-    <div class="toggle-row">
-      <div>
-        <div>Desktop notification</div>
-        <div class="toggle-desc">Show toast when bookmark sorted</div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="groupName">Group Name</label>
+          <input type="text" id="groupName" placeholder="e.g. GITHUB, NEPAL NEWS, AI">
+        </div>
+        <div class="form-group">
+          <label for="groupEmoji">Icon (Emoji)</label>
+          <div class="emoji-input-wrapper">
+            <input type="text" id="groupEmoji" placeholder="🌐" maxlength="2" class="emoji-input">
+            <div class="emoji-quick-select">
+              <span class="emoji-option" data-emoji="🇳🇵">🇳🇵</span>
+              <span class="emoji-option" data-emoji="📈">📈</span>
+              <span class="emoji-option" data-emoji="🤖">🤖</span>
+              <span class="emoji-option" data-emoji="💻">💻</span>
+              <span class="emoji-option" data-emoji="🔧">🔧</span>
+              <span class="emoji-option" data-emoji="💬">💬</span>
+              <span class="emoji-option" data-emoji="📧">📧</span>
+              <span class="emoji-option" data-emoji="📹">📹</span>
+              <span class="emoji-option" data-emoji="📋">📋</span>
+              <span class="emoji-option" data-emoji="🛒">🛒</span>
+              <span class="emoji-option" data-emoji="🎨">🎨</span>
+              <span class="emoji-option" data-emoji="📄">📄</span>
+              <span class="emoji-option" data-emoji="📊">📊</span>
+              <span class="emoji-option" data-emoji="🌐">🌐</span>
+              <span class="emoji-option" data-emoji="🔒">🔒</span>
+              <span class="emoji-option" data-emoji="🎮">🎮</span>
+            </div>
+          </div>
+          <p class="form-hint">Click an emoji above or paste/type your own</p>
+        </div>
+        <div class="form-group">
+          <label for="groupDomains">Domains</label>
+          <textarea id="groupDomains" placeholder="github.com&#10;github.io"></textarea>
+          <p class="form-hint">One domain per line. Subdomains match automatically.</p>
+        </div>
       </div>
-      <label class="switch">
-        <input type="checkbox" id="notify" checked>
-        <span class="slider"></span>
-      </label>
-    </div>
-
-    <!-- Category preview -->
-    <div class="cat-preview">
-      <div class="cat-preview-title">📂 Smart Categories</div>
-      <div class="cat-list">
-        <span class="cat-tag">YouTube</span>
-        <span class="cat-tag">📈 Finance</span>
-        <span class="cat-tag">💻 Dev Tools</span>
-        <span class="cat-tag">🎓 Education</span>
-        <span class="cat-tag">🤖 AI</span>
-        <span class="cat-tag">Nepal News</span>
-        <span class="cat-tag">Social Media</span>
-        <span class="cat-tag">🛒 Shopping</span>
-        <span class="cat-tag">🍜 Food</span>
-        <span class="cat-tag">💪 Health</span>
-        <span class="cat-tag">✈️ Travel</span>
-        <span class="cat-tag">💼 Jobs</span>
-        <span class="cat-tag">🎨 Design</span>
-        <span class="cat-tag">🎬 Entertainment</span>
-        <span class="cat-tag">🛠️ Tools</span>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" id="modalCancel">Cancel</button>
+        <button class="btn btn-primary" id="modalSave">Save</button>
       </div>
     </div>
   </div>
 
-  <div class="footer">sunyai v3.0 · zero CPU drain · Nepali-aware</div>
+  <!-- Domain Conflict Modal -->
+  <div class="modal-overlay" id="conflictModalOverlay">
+    <div class="conflict-modal">
+      <div class="conflict-header">
+        <span class="conflict-icon">&#9888;</span>
+        <h3>Domain Conflict Detected</h3>
+      </div>
+      <div class="conflict-body" id="conflictBody"></div>
+      <div class="conflict-footer">
+        <div class="conflict-footer-left">
+          <button class="btn btn-ghost" id="conflictCancel">Cancel</button>
+        </div>
+        <button class="btn btn-primary" id="conflictConfirm">Move &amp; Save</button>
+      </div>
+    </div>
+  </div>
 
+  <!-- Scripts -->
+  <script src="popup/state.js"></script>
+  <script src="popup/constants.js"></script>
+  <script src="popup/utils.js"></script>
+  <script src="popup/renderers/active-groups.js"></script>
+  <script src="popup/renderers/domain-groups.js"></script>
+  <script src="popup/renderers/search-results.js"></script>
+  <script src="popup/renderers/config-groups.js"></script>
+  <script src="popup/modals.js"></script>
+  <script src="popup/loaders.js"></script>
+  <script src="popup/crud.js"></script>
+  <script src="popup/search.js"></script>
+  <script src="popup/navigation/collection.js"></script>
+  <script src="popup/navigation/selection.js"></script>
+  <script src="popup/navigation/activation.js"></script>
+  <script src="popup/events/groups.js"></script>
+  <script src="popup/events/search.js"></script>
+  <script src="popup/events/config.js"></script>
+  <script src="popup/events/panel.js"></script>
+  <script src="popup/events/modals.js"></script>
+  <script src="popup/events/buttons.js"></script>
+  <script src="popup/events/search-input.js"></script>
+  <script src="popup/focus-mode.js"></script>
+  <script src="popup/bookmarks.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>

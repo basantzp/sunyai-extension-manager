@@ -1,87 +1,86 @@
-# ⚡ sunyai extension manager (Autonomous Bookmark Organizer & Browser Engine)
+# ⚡ sunyai extension manager (Unified Workspace & Bookmark Engine)
 
-**Version 3.0** (Extension `v1.2.0`) — An ultra-lightweight, autonomous, sub-millisecond bookmark organizer designed for maximum battery efficiency, instant responsiveness, and deep Nepali-aware taxonomy. Whenever you save a bookmark (`Ctrl+D`, star icon, context menu, or mobile sync), it **instantly categorizes it into the right Category and Subfolder within milliseconds**.
-
----
-
-### ⚡ What's New in v3.0?
-
-1. **🇳🇵 Deep Nepali Intelligence**:
-   - Native Devanagari script detection (`[\u0900-\u097F]`) for automatic Nepali content routing.
-   - Built-in recognition for 35+ Nepali artists and bands (Sujan Chapagain, Bartika Rai, Yama Buddha, 1974 AD, Cobweb, Albatross, Bipul Chettri, Sushant KC, Prakash Saput, etc.).
-   - Full routing for Nepal news portals (*Setopati*, *Onlinekhabar*, *eKantipur*, *Ratopati*, *Annapurna Post*, *Hamro Patro*, etc.), e-commerce (*Daraz*, *Sastodeal*, *Hamrobazar*), and Nepal universities/exams (*TU*, *KU*, *PU*, *Moodle*).
-
-2. **📺 YouTube Smart 17-Subfolder Matrix**:
-   - Intelligent Nepali / English / Bollywood splits for **Music** (`🎵 Nepali Music`, `🎵 Bollywood & Hindi`, `🎵 English Music`).
-   - Separate splits for **Vlogs** (`📹 Nepali Vlogs` vs `📹 English Vlogs`) and **Comedy** (`😂 Nepali Comedy` vs `😂 Comedy & Entertainment`).
-   - Direct routing for `📈 NEPSE & Share Market`, `🎬 Documentary`, `🎬 Short Films & Cinema`, `🎓 Courses & Tutorials`, `📱 Tech Reviews & Gadgets`, `🔬 Research & Science`, `🎙️ Podcasts & Interviews`, `💡 Motivation & Self-Help`, `🍜 Cooking & Food`, and `🎮 Gaming`.
-
-3. **🌐 Expanded Social Media**:
-   - **Reddit**: Partitioned into `Reddit – Nepal`, `Reddit – Tech`, `Reddit – Finance`, and `Reddit – General`.
-   - Dedicated routing for **Twitter / X**, **Instagram**, **Facebook**, **LinkedIn** (Jobs vs Articles), and **TikTok**.
-
-4. **📂 15 Intelligent Top-Level Categories**:
-   - Up to 15 top-level categories (raised from 12) with a smart scoring router that protects your bookmark bar from clutter:
-     - `🤖 AI & Machine Learning`
-     - `💻 Developer Tools`
-     - `📈 Finance & Investing`
-     - `🎓 Education`
-     - `💼 Career & Jobs`
-     - `🛒 Shopping`
-     - `🍜 Food & Recipes`
-     - `💪 Health & Fitness`
-     - `✈️ Travel & Places`
-     - `🎨 Design & Creative`
-     - `🎬 Entertainment`
-     - `Social Media`
-     - `Nepal News`
-     - `World News`
-     - `🛠️ Web Tools`
-
-5. **⚡ Sub-Millisecond Speed (< 1 ms)**:
-   - In-memory cached taxonomy matching and local genre parsing executes in ~0.007 ms. Zero remote API dependencies.
-
-6. **0% Background CPU & Battery Friendly**:
-   - Event-driven bookmark listeners (`onCreated`, `onMoved`, `onChanged`) wake for ~15 ms and return to sleep.
-   - Overcrowded auto-partitioning threshold adjusted to **8 items** to prevent premature over-splitting.
-
-7. **In-Page Floating Toast Pill**:
-   - Sleek breadcrumb pill injected into the active page: `⚡ Saved to Category › Subfolder`, auto-dissolving with cubic-bezier easing.
-
-8. **Redesigned HUD Popup**:
-   - Animated live status dot indicator.
-   - Quick stats row (organized bookmarks count + last sync timestamp + version `v1.2.0`).
-   - Real-time destination card displaying target folder and subfolder.
-   - Settings drawer with category preview chips and optional OpenRouter zero-API mode fallback.
+**Version 2.0.0** — An all-in-one browser power suite merging **TabFlow** (intelligent domain tab grouping & vim-style navigation) and **Sunyai Autonomous Bookmark Organizer** (sub-millisecond local taxonomy & Nepali intelligence). Built for maximum battery efficiency, 0% background idle CPU, and deep workflow speed.
 
 ---
 
-### 🦀 Compiled Native Rust Engine (`brave-bookmark-engine`)
+## 🌟 Key Features
 
-For users wanting a standalone, compiled native binary that does not depend on the browser runtime and runs full bookmark sweeps in microseconds with 0% CPU impact:
+### 🗂️ 1. Smart TabFlow Workspace Manager
+- **Domain-Based Auto Grouping**: Automatically organize tabs into color-coded, labeled browser tab groups by domain rules or on-demand.
+- **🇳🇵 Built-In Nepal & Global Domain Ecosystem**:
+  - **Nepal News**: *Setopati*, *Onlinekhabar*, *eKantipur*, *Ratopati*, *Annapurna Post*, *Hamro Patro*, *Nagarik News*.
+  - **NEPSE & Finance**: *MeroShare*, *NepalStock*, *Sharesansar*, *NepseAlpha*, *Merolagani*.
+  - **Nepal Shopping**: *Daraz*, *Sastodeal*, *Hamrobazar*, *Gyapu*.
+  - **AI & Dev**: *GitHub*, *GitLab*, *OpenAI*, *Anthropic*, *HuggingFace*, *Perplexity*, *Vercel*, *StackOverflow*, *AWS*, *Google Cloud*.
+  - **Social, Media & Productivity**: *Twitter / X*, *YouTube*, *Reddit*, *LinkedIn*, *Gmail*, *Notion*, *Figma*.
+- **Duplicate Tab Prevention**: Automatically focuses an existing tab rather than opening duplicate URLs.
+- **Side Panel & Popup Dual Mode**: Seamlessly toggle between Chrome/Brave side panel (`sidepanel`) and quick action popup (`popup`).
+- **Keyboard Navigation (Vim Mode)**:
+  - `j` / `k` or `↓` / `↑`: Navigate tabs and groups.
+  - `l` or `Enter`: Activate / switch to tab.
+  - `h` or `Esc`: Exit search or focus mode.
+  - `/` or `i`: Instant tab search.
+  - `1`, `2`, `3`: Quick jump between **Tabs**, **Bookmarks**, and **Settings**.
+- **Display Modes & Auto-Collapse**: Custom group title formatting (Icon, Count, Name) and auto-collapse for inactive groups.
+
+---
+
+### ⚡ 2. Autonomous Bookmark Organizer
+- **Sub-Millisecond Speed (<1ms)**: Local genre and taxonomy matching executes in ~0.007 ms with zero remote API dependencies.
+- **🇳🇵 Deep Nepali Intelligence**:
+  - Native Devanagari script detection (`[\u0900-\u097F]`).
+  - 35+ Nepali musical artists recognized (Sujan Chapagain, Bartika Rai, Yama Buddha, 1974 AD, Cobweb, Albatross, Bipul Chettri, Sushant KC, Prakash Saput, etc.).
+  - Automatic portal categorization for Nepal universities (*TU*, *KU*, *PU*, *Moodle*), government, and e-commerce.
+- **📺 YouTube Smart 17-Subfolder Matrix**:
+  - Distinguishes **Nepali Music**, **Bollywood & Hindi**, and **English Music**.
+  - Separate splits for **Nepali Vlogs**, **Documentaries**, **Cinema**, **NEPSE & Share Market**, **Courses & Tutorials**, **Gadget Reviews**, and **Podcasts**.
+- **15 Top-Level Categories**: Preserves a clutter-free bookmark bar:
+  - `🤖 AI & Machine Learning`, `💻 Developer Tools`, `📈 Finance & Investing`, `🎓 Education`, `💼 Career & Jobs`, `🛒 Shopping`, `🍜 Food & Recipes`, `💪 Health & Fitness`, `✈️ Travel & Places`, `🎨 Design & Creative`, `🎬 Entertainment`, `Social Media`, `Nepal News`, `World News`, `🛠️ Web Tools`.
+- **In-Page Floating Toast Pill**: Sleek, non-intrusive HUD pill injected on save: `⚡ Saved to Category › Subfolder`.
+- **Zero Battery Drain**: Event-driven architecture wakes only on bookmark modifications and returns immediately to 0% CPU sleep.
+
+---
+
+### 🦀 3. Standalone Compiled Rust Engine (`brave-bookmark-engine`)
+A compiled native binary located in `native-engine/` that executes sub-millisecond full bookmark sweeps and inotify file monitoring outside the browser runtime:
 
 ```bash
-cd ~/.config/BraveSoftware/Brave-Browser/extensions/bookmark-organizer
-
-# 1. Instant full sweep across all bookmarks
+# 1. Full sweep across all browser bookmarks
 ./brave-bookmark-engine organize
 
-# 2. View category statistics
+# 2. Category telemetry and distribution stats
 ./brave-bookmark-engine stats
 
-# 3. Background inotify/event-driven watcher (0% CPU, wakes only on file change)
+# 3. Background inotify watcher (0% CPU, wakes only on change)
 ./brave-bookmark-engine watch
 ```
 
 ---
 
-### 🚀 Browser Extension Installation (Brave / Chrome)
+## 🚀 Installation (Brave / Google Chrome / Chromium)
 
-1. Open **Brave** or **Google Chrome**.
-2. Navigate to `brave://extensions` (or `chrome://extensions`).
-3. Enable **"Developer mode"** in the top-right corner.
-4. Click **"Load unpacked"** in the top-left corner.
-5. Select this directory:
-   `/home/basant/.config/BraveSoftware/Brave-Browser/extensions/bookmark-organizer`
-6. Click the reload button on the extension card if already loaded.
-7. Real-time auto-organize is active with 0% idle CPU and instant sub-millisecond response time.
+1. Open Brave or Chrome and go to `brave://extensions` (or `chrome://extensions`).
+2. Enable **"Developer mode"** (toggle in the top-right corner).
+3. Click **"Load unpacked"** in the top-left corner.
+4. Select the directory:
+   ```
+   /home/basant/.config/BraveSoftware/Brave-Browser/extensions/bookmark-organizer
+   ```
+5. Pin the extension to your toolbar or open the side panel for instant tab and bookmark management!
+
+---
+
+## ⌨️ Shortcuts Reference
+
+| Key | Action |
+| --- | --- |
+| `1` | Jump to **Tabs** view |
+| `2` | Jump to **Bookmarks** view |
+| `3` | Jump to **Settings** view |
+| `j` / `↓` | Next tab / group |
+| `k` / `↑` | Previous tab / group |
+| `l` / `Enter` | Focus / activate selected tab |
+| `/` or `i` | Search open tabs |
+| `Esc` | Clear search / close modal / exit focus mode |
+| `Ctrl+D` | Save bookmark (instantly auto-categorized) |

@@ -1,124 +1,197 @@
-document.addEventListener("DOMContentLoaded", async () => {
-  const organizeBtn    = document.getElementById("organizeBtn");
-  const btnText        = document.getElementById("btnText");
-  const btnIcon        = document.getElementById("btnIcon");
-  const resultMsg      = document.getElementById("resultMsg");
-  const settingsToggle = document.getElementById("settingsToggle");
-  const settingsPanel  = document.getElementById("settingsPanel");
+// TabFlow Group Toggle
+if (groupToggle) {
+  groupToggle.addEventListener('change', async () => {
+    groupToggle.disabled = true;
+    if (expandAllBtn) expandAllBtn.style.display = groupToggle.checked ? '' : 'none';
 
-  const apiKeyInput       = document.getElementById("apiKey");
-  const modelSelect       = document.getElementById("model");
-  const autoOrganizeCheck = document.getElementById("autoOrganize");
-  const notifyCheck       = document.getElementById("notify");
+    try {
+      if (groupToggle.checked) {
+        const result = await sendMessage('groupTabs');
+        if (result.success) {
+          showStatus(`Grouped ${result.groupedCount} domain${result.groupedCount !== 1 ? 's' : ''}`, 'success');
+          await loadActiveGroups();
+        } else {
+          showStatus(result.message || 'Failed', 'error');
+          groupToggle.checked = false;
+          if (expandAllBtn) expandAllBtn.style.display = 'none';
+        }
+      } else {
+        const result = await sendMessage('ungroupAll');
+        if (result.success) {
+          showStatus(`Ungrouped ${result.ungroupedCount} tab${result.ungroupedCount !== 1 ? 's' : ''}`, 'success');
+          await loadDomainGroups();
+        } else {
+          showStatus(result.message || 'Failed', 'error');
+          groupToggle.checked = true;
+          if (expandAllBtn) expandAllBtn.style.display = '';
+        }
+      }
+    } catch (e) {
+      showStatus('Error: ' + e.message, 'error');
+      groupToggle.checked = !groupToggle.checked;
+      if (expandAllBtn) expandAllBtn.style.display = groupToggle.checked ? '' : 'none';
+    }
 
-  const destCard      = document.getElementById("destCard");
-  const destFolder    = document.getElementById("destFolder");
-  const destSubfolder = document.getElementById("destSubfolder");
-  const destTime      = document.getElementById("destTime");
-  const statCount     = document.getElementById("statCount");
-  const statTime      = document.getElementById("statTime");
-
-  // Load saved settings
-  const settings = await chrome.storage.local.get({
-    apiKey: "",
-    model: "z-ai/glm-5.2:free",
-    autoOrganize: true,
-    notify: true,
-    lastOrganizedCount: 0,
-    lastRun: null,
-    lastFolder: "",
-    lastSubfolder: ""
+    groupToggle.disabled = false;
+    if (searchInput) searchInput.focus();
   });
+}
 
-  apiKeyInput.value         = settings.apiKey || "";
-  modelSelect.value         = settings.model  || "z-ai/glm-5.2:free";
-  autoOrganizeCheck.checked = settings.autoOrganize !== false;
-  notifyCheck.checked       = settings.notify       !== false;
-
-  // Populate stats
-  if (settings.lastOrganizedCount > 0) {
-    statCount.textContent = settings.lastOrganizedCount;
-  }
-  if (settings.lastRun) {
-    statTime.textContent = settings.lastRun;
+// Keyboard shortcuts (Vim navigation + numeric tab switching)
+document.addEventListener('keydown', (e) => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+    if (e.target === searchInput && e.key === 'Escape') {
+      if (typeof exitSearch === 'function') exitSearch();
+    }
+    return;
   }
 
-  // Restore last destination card
-  if (settings.lastFolder && settings.lastSubfolder) {
-    showDestination(settings.lastFolder, settings.lastSubfolder, settings.lastRun);
+  if (e.key === 'Escape') {
+    if (modalOverlay && modalOverlay.classList.contains('open')) {
+      if (typeof closeModal === 'function') closeModal();
+    } else if (conflictModalOverlay && conflictModalOverlay.classList.contains('open')) {
+      if (typeof closeConflictModal === 'function') closeConflictModal();
+    } else if (searchActive) {
+      if (typeof exitSearch === 'function') exitSearch();
+    } else if (settingsPanel && (settingsPanel.classList.contains('open') || settingsPanel.classList.contains('active'))) {
+      const homeTabBtn = document.getElementById('tabNavTabs');
+      if (homeTabBtn) homeTabBtn.click();
+    } else if (focusedGroupId) {
+      if (typeof exitFocusMode === 'function') exitFocusMode();
+    }
+    return;
   }
 
-  // Toggle settings panel
-  settingsToggle.addEventListener("click", () => {
-    settingsPanel.classList.toggle("open");
-    settingsToggle.textContent = settingsPanel.classList.contains("open") ? "✕" : "⚙️";
-  });
-
-  // Auto-save any settings change
-  const saveSettings = () => {
-    chrome.storage.local.set({
-      apiKey:       apiKeyInput.value.trim(),
-      model:        modelSelect.value,
-      autoOrganize: autoOrganizeCheck.checked,
-      notify:       notifyCheck.checked
-    });
-  };
-  apiKeyInput.addEventListener("change", saveSettings);
-  modelSelect.addEventListener("change", saveSettings);
-  autoOrganizeCheck.addEventListener("change", saveSettings);
-  notifyCheck.addEventListener("change", saveSettings);
-
-  // Show destination card
-  function showDestination(folder, subfolder, time) {
-    if (folder && subfolder) {
-      destFolder.textContent    = folder;
-      destSubfolder.textContent = subfolder;
-      destTime.textContent      = time || "";
-      destCard.style.display    = "block";
+  // Quick tab navigation: 1 for Tabs, 2 for Bookmarks, 3 for Settings
+  if (!modalOverlay?.classList.contains('open') && !conflictModalOverlay?.classList.contains('open')) {
+    if (e.key === '1') {
+      document.getElementById('tabNavTabs')?.click();
+      return;
+    } else if (e.key === '2') {
+      document.getElementById('tabNavBookmarks')?.click();
+      return;
+    } else if (e.key === '3') {
+      document.getElementById('tabNavSettings')?.click();
+      return;
     }
   }
 
-  // Main sync handler
-  const performSync = (isAuto = false) => {
-    organizeBtn.disabled  = true;
-    btnText.textContent   = "Organizing…";
-    btnIcon.textContent   = "⏳";
-    resultMsg.textContent = "";
+  // Only handle tab-list keyboard navigation when on the Tabs tab
+  const homeTab = document.getElementById('homeTab');
+  const isHomeTabActive = homeTab && homeTab.classList.contains('active');
 
-    chrome.runtime.sendMessage({ action: "organize_now" }, (response) => {
-      organizeBtn.disabled = false;
-      btnText.textContent  = "Organize Now";
-      btnIcon.textContent  = "⚡";
-
-      if (response && response.success) {
-        resultMsg.style.color = "var(--success)";
-        const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-        if (response.lastFolder && response.lastSubfolder) {
-          showDestination(response.lastFolder, response.lastSubfolder, now);
-          resultMsg.textContent = `✓ Saved to ${response.lastFolder} › ${response.lastSubfolder}`;
-          statCount.textContent = response.count || settings.lastOrganizedCount || 0;
-          statTime.textContent  = now;
-        } else if (response.count > 0) {
-          resultMsg.textContent = `✓ Organized ${response.count} bookmark${response.count > 1 ? 's' : ''}!`;
-          statCount.textContent = response.count;
-          statTime.textContent  = now;
-        } else {
-          resultMsg.textContent = `✓ All bookmarks already organized!`;
-          statTime.textContent  = now;
-        }
+  if (e.key === '/' || e.key === 'i' || e.key === 'I') {
+    if (isHomeTabActive) {
+      e.preventDefault();
+      if (typeof enterSearch === 'function') enterSearch();
+    }
+  } else if (e.key === 'j' || e.key === 'J' || e.key === 'ArrowDown') {
+    e.preventDefault();
+    if (typeof getNavItems === 'function' && typeof selectItem === 'function') {
+      const items = getNavItems();
+      if (items.length === 0) return;
+      if (navIndex < 0) {
+        selectItem(0);
       } else {
-        resultMsg.style.color = "#ef4444";
-        resultMsg.textContent = `Notice: ${response?.error || "Up to date"}` ;
+        selectItem((navIndex + 1) % items.length);
       }
-
-      // Clear message after 4s
-      setTimeout(() => { resultMsg.textContent = ""; }, 4000);
-    });
-  };
-
-  organizeBtn.addEventListener("click", () => performSync(false));
-
-  // Auto-sync on popup open
-  setTimeout(() => { performSync(true); }, 120);
+    }
+  } else if (e.key === 'k' || e.key === 'K' || e.key === 'ArrowUp') {
+    e.preventDefault();
+    if (typeof getNavItems === 'function' && typeof selectItem === 'function') {
+      const items = getNavItems();
+      if (items.length === 0) return;
+      if (navIndex < 0) {
+        selectItem(items.length - 1);
+      } else {
+        selectItem((navIndex - 1 + items.length) % items.length);
+      }
+    }
+  } else if (e.key === 'l' || e.key === 'L' || e.key === 'Enter' || e.key === 'ArrowRight') {
+    e.preventDefault();
+    if (typeof activateItem === 'function') {
+      activateItem().catch(console.error);
+    }
+  } else if (e.key === 'h' || e.key === 'H' || e.key === 'ArrowLeft') {
+    e.preventDefault();
+    if (settingsPanel && (settingsPanel.classList.contains('open') || settingsPanel.classList.contains('active'))) {
+      const homeTabBtn = document.getElementById('tabNavTabs');
+      if (homeTabBtn) homeTabBtn.click();
+    } else if (modalOverlay && modalOverlay.classList.contains('open')) {
+      if (typeof closeModal === 'function') closeModal();
+    } else if (conflictModalOverlay && conflictModalOverlay.classList.contains('open')) {
+      if (typeof closeConflictModal === 'function') closeConflictModal();
+    } else if (searchActive) {
+      if (typeof exitSearch === 'function') exitSearch();
+    } else if (focusedGroupId) {
+      if (typeof exitFocusMode === 'function') exitFocusMode();
+    }
+  }
 });
+
+// Bootstrap on DOM load
+(async () => {
+  const isSidePanel = new URLSearchParams(window.location.search).get('context') === 'sidepanel';
+  if (isSidePanel) {
+    document.body.classList.add('sidepanel-mode');
+  } else {
+    document.body.classList.add('popup-mode');
+  }
+
+  // Initialize Bookmarks View logic
+  if (typeof initBookmarksView === 'function') {
+    initBookmarksView();
+  }
+
+  try {
+    const state = await sendMessage('getState');
+    if (groupToggle) groupToggle.checked = Boolean(state.enabled);
+
+    const autoCollapse = await sendMessage('getAutoCollapse');
+    if (autoCollapseToggle) autoCollapseToggle.checked = Boolean(autoCollapse.autoCollapse);
+
+    const duplicatePrevention = await sendMessage('getDuplicatePrevention');
+    if (duplicatePreventionToggle) duplicatePreventionToggle.checked = Boolean(duplicatePrevention.enabled);
+
+    const groupUnlisted = await sendMessage('getGroupUnlisted');
+    if (groupUnlistedToggle) groupUnlistedToggle.checked = Boolean(groupUnlisted.enabled);
+
+    const displayMode = await sendMessage('getDisplayMode');
+    if (displayModeSelect && displayMode.mode) displayModeSelect.value = displayMode.mode;
+
+    const uiMode = await sendMessage('getUiMode');
+    if (uiModeToggle) uiModeToggle.checked = uiMode.mode === 'sidepanel';
+  } catch (e) {
+    console.error('Failed to get settings:', e);
+  }
+
+  if (expandAllBtn && groupToggle) {
+    expandAllBtn.style.display = groupToggle.checked ? '' : 'none';
+  }
+
+  if (groupToggle && groupToggle.checked) {
+    await loadActiveGroups();
+  } else {
+    await loadDomainGroups();
+  }
+
+  requestAnimationFrame(() => {
+    if (searchInput) searchInput.focus();
+    if (typeof selectItem === 'function') selectItem(0);
+  });
+
+  // Background bookmark silent sweep on startup
+  setTimeout(() => {
+    if (typeof window.performBookmarkSync === 'function') {
+      window.performBookmarkSync(true);
+    }
+  }, 350);
+})();
+
+if (uiModeToggle) {
+  uiModeToggle.addEventListener('change', async () => {
+    const mode = uiModeToggle.checked ? 'sidepanel' : 'popup';
+    await sendMessage('setUiMode', { mode });
+    showStatus(`UI Mode switched to ${mode === 'sidepanel' ? 'Side Panel' : 'Popup'}. Click the extension icon to see changes.`, 'success');
+  });
+}

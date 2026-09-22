@@ -1,0 +1,235 @@
+[
+  {
+    "id": "slack",
+    "name": "SLACK",
+    "emoji": "\ud83d\udcac",
+    "domains": [
+      "slack.com",
+      "slackhq.com"
+    ]
+  },
+  {
+    "id": "meet",
+    "name": "MEET",
+    "emoji": "\ud83d\udcf9",
+    "domains": [
+      "meet.google.com",
+      "zoom.us",
+      "zoom.com",
+      "webex.com",
+      "gotomeeting.com",
+      "teams.microsoft.com"
+    ]
+  },
+  {
+    "id": "jira",
+    "name": "JIRA",
+    "emoji": "\ud83d\udccb",
+    "domains": [
+      "atlassian.net",
+      "jira.atlassian.com",
+      "jira.com",
+      "trello.com",
+      "asana.com",
+      "monday.com",
+      "linear.app",
+      "clickup.com",
+      "notion.so",
+      "confluence.atlassian.com"
+    ]
+  },
+  {
+    "id": "mail",
+    "name": "MAIL",
+    "emoji": "\ud83d\udce7",
+    "domains": [
+      "gmail.com",
+      "mail.google.com",
+      "outlook.live.com",
+      "outlook.office.com",
+      "outlook.com",
+      "protonmail.com",
+      "proton.me",
+      "fastmail.com",
+      "hey.com",
+      "zoho.com",
+      "yahoo.com",
+      "icloud.com",
+      "mail.com",
+      "rackspace.com"
+    ]
+  },
+  {
+    "id": "git",
+    "name": "GIT",
+    "emoji": "\ud83d\udd27",
+    "domains": [
+      "github.com",
+      "github.io",
+      "gitlab.com",
+      "bitbucket.org",
+      "dev.to",
+      "stackoverflow.com",
+      "stackexchange.com",
+      "npmjs.com",
+      "pypi.org",
+      "crates.io",
+      "npmjs.org"
+    ]
+  },
+  {
+    "id": "ai",
+    "name": "AI",
+    "emoji": "\ud83e\udd16",
+    "domains": [
+      "chatgpt.com",
+      "openai.com",
+      "anthropic.com",
+      "claude.ai",
+      "gemini.google.com",
+      "copilot.microsoft.com",
+      "perplexity.ai",
+      "huggingface.co",
+      "cursor.com",
+      "windsurf.com",
+      "replit.com",
+      "v0.dev",
+      "lovable.dev",
+      "bolt.new",
+      "deepseek.com",
+      "mistral.ai",
+      "cohere.com"
+    ]
+  },
+  {
+    "id": "ci",
+    "name": "CI",
+    "emoji": "\u2699\ufe0f",
+    "domains": [
+      "circleci.com",
+      "travis-ci.com",
+      "github.com/actions",
+      "gitlab.com/ci",
+      "jenkins.io",
+      "buildkite.com",
+      "codefresh.io",
+      "semaphoreci.com",
+      "drone.io",
+      "bitbucket.org/pipelines"
+    ]
+  },
+  {
+    "id": "db",
+    "name": "DB",
+    "emoji": "\ud83d\uddc4\ufe0f",
+    "domains": [
+      "supabase.com",
+      "neon.tech",
+      "planetscale.com",
+      "railway.app",
+      "mongodb.com",
+      "redis.com",
+      "postgresql.org",
+      "mysql.com",
+      "mariadb.org",
+      "sqlite.org",
+      "cockroachlabs.com",
+      "clickhouse.com",
+      "dynamodb.amazonaws.com",
+      "console.firebase.google.com"
+    ]
+  },
+  {
+    "id": "design",
+    "name": "DESIGN",
+    "emoji": "\ud83c\udfa8",
+    "domains": [
+      "figma.com",
+      "canva.com",
+      "dribbble.com",
+      "behance.net",
+      "adobe.com",
+      "sketch.com",
+      "framer.com",
+      "invisionapp.com",
+      "zeplin.io",
+      "marvelapp.com"
+    ]
+  },
+  {
+    "id": "docs",
+    "name": "DOCS",
+    "emoji": "\ud83d\udcc4",
+    "domains": [
+      "docs.google.com",
+      "sheets.google.com",
+      "slides.google.com",
+      "drive.google.com",
+      "notion.so",
+      "notion.site",
+      "confluence.atlassian.com",
+      "readthedocs.io",
+      "gitbook.io"
+    ]
+  },
+  {
+    "id": "logs",
+    "name": "LOGS",
+    "emoji": "\ud83d\udcca",
+    "domains": [
+      "console.cloud.google.com",
+      "console.aws.amazon.com",
+      "loggly.com",
+      "datadog.com",
+      "splunk.com",
+      "papertrail.com",
+      "logrocket.com",
+      "sentry.io",
+      "bugsnag.com"
+    ]
+  },
+  {
+    "id": "nepal-news",
+    "name": "NEPAL NEWS",
+    "emoji": "\ud83c\uddf3\ud83c\uddf5",
+    "domains": [
+      "setopati.com",
+      "onlinekhabar.com",
+      "ekantipur.com",
+      "ratopati.com",
+      "annapurnapost.com",
+      "hamropatro.com",
+      "nagariknews.com"
+    ]
+  },
+  {
+    "id": "nepse",
+    "name": "NEPSE & FINANCE",
+    "emoji": "\ud83d\udcc8",
+    "domains": [
+      "meroshare.cdsc.com.np",
+      "nepalstock.com.np",
+      "nepalstock.com",
+      "sharesansar.com",
+      "nepsealpha.com",
+      "merolagani.com"
+    ]
+  },
+  {
+    "id": "nepal-shopping",
+    "name": "NEPAL SHOPPING",
+    "emoji": "\ud83d\uded2",
+    "domains": [
+      "daraz.com.np",
+      "sastodeal.com",
+      "hamrobazar.com",
+      "gyapu.com"
+    ]
+  },
+  {
+    "id": "others",
+    "name": "OTHERS",
+    "emoji": "\ud83c\udf10",
+    "domains": []
+  }
+]
