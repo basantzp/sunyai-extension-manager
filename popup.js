@@ -11,9 +11,11 @@ if (groupToggle) {
           showStatus(`Grouped ${result.groupedCount} domain${result.groupedCount !== 1 ? 's' : ''}`, 'success');
           await loadActiveGroups();
         } else {
-          showStatus(result.message || 'Failed', 'error');
-          groupToggle.checked = false;
-          if (expandAllBtn) expandAllBtn.style.display = 'none';
+          // If service worker was asleep, reload silently instead of showing raw error
+          if (result.message && !result.message.includes('message port closed') && !result.message.includes('Waking up')) {
+            showStatus(result.message, 'error');
+          }
+          await loadActiveGroups();
         }
       } else {
         const result = await sendMessage('ungroupAll');
@@ -21,15 +23,16 @@ if (groupToggle) {
           showStatus(`Ungrouped ${result.ungroupedCount} tab${result.ungroupedCount !== 1 ? 's' : ''}`, 'success');
           await loadDomainGroups();
         } else {
-          showStatus(result.message || 'Failed', 'error');
-          groupToggle.checked = true;
-          if (expandAllBtn) expandAllBtn.style.display = '';
+          if (result.message && !result.message.includes('message port closed') && !result.message.includes('Waking up')) {
+            showStatus(result.message, 'error');
+          }
+          await loadDomainGroups();
         }
       }
     } catch (e) {
-      showStatus('Error: ' + e.message, 'error');
-      groupToggle.checked = !groupToggle.checked;
-      if (expandAllBtn) expandAllBtn.style.display = groupToggle.checked ? '' : 'none';
+      if (!e.message?.includes('message port closed')) {
+        showStatus('Error: ' + e.message, 'error');
+      }
     }
 
     groupToggle.disabled = false;
@@ -51,10 +54,15 @@ if (quickSortBtn) {
         if (expandAllBtn) expandAllBtn.style.display = '';
         await loadActiveGroups();
       } else {
-        showStatus(result.message || 'Failed', 'error');
+        if (result.message && !result.message.includes('message port closed') && !result.message.includes('Waking up')) {
+          showStatus(result.message, 'error');
+        }
+        await loadActiveGroups();
       }
     } catch (e) {
-      showStatus('Error: ' + e.message, 'error');
+      if (!e.message?.includes('message port closed')) {
+        showStatus('Error: ' + e.message, 'error');
+      }
     }
     quickSortBtn.disabled = false;
     quickSortBtn.textContent = oldText;
