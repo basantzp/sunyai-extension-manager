@@ -7,14 +7,12 @@ function renderActiveGroups(data) {
 
   const shortcutsHtml = `
     <div class="shortcuts-hint">
-      <span><kbd>j</kbd> / <kbd>k</kbd> Navigate</span>
-      <span><kbd>Enter</kbd> Select</span>
-      <span><kbd>/</kbd> or <kbd>i</kbd> Search</span>
-      <span><kbd>Esc</kbd> Exit / Close</span>
-      <span style="border-top:1px solid var(--border-color);padding-top:6px;margin-top:4px;"><kbd>Alt+H</kbd> Previous group</span>
-      <span><kbd>Alt+L</kbd> Next group</span>
-      <span><kbd>Alt+E</kbd> Toggle current group</span>
-      <span><kbd>Alt+T</kbd> Open TabFlow</span>
+      <span><kbd>j</kbd><kbd>k</kbd> Nav</span>
+      <span><kbd>↵</kbd> Select</span>
+      <span><kbd>/</kbd> Search</span>
+      <span><kbd>Esc</kbd> Close</span>
+      <span><kbd>Alt+H/L</kbd> Group</span>
+      <span><kbd>Alt+E</kbd> Toggle</span>
     </div>
   `;
 
@@ -22,18 +20,9 @@ function renderActiveGroups(data) {
     groupsList.innerHTML = `
       <div class="empty-state">
         <p>No tab groups active</p>
-        <button class="btn btn-primary btn-sm" id="emptySortBtn" style="margin-top:10px;">Sort Tabs into Groups</button>
+        <button class="btn btn-primary btn-sm" id="emptySortBtn" style="margin-top:8px;">Sort Tabs into Groups</button>
       </div>
-      <div class="shortcuts-hint">
-        <span><kbd>j</kbd> / <kbd>k</kbd> Navigate</span>
-        <span><kbd>Enter</kbd> Select</span>
-        <span><kbd>/</kbd> or <kbd>i</kbd> Search</span>
-        <span><kbd>Esc</kbd> Exit / Close</span>
-        <span style="border-top:1px solid var(--border-color);padding-top:6px;margin-top:4px;"><kbd>Alt+H</kbd> Previous group</span>
-        <span><kbd>Alt+L</kbd> Next group</span>
-        <span><kbd>Alt+E</kbd> Toggle current group</span>
-        <span><kbd>Alt+T</kbd> Open TabFlow</span>
-      </div>
+      ${shortcutsHtml}
     `;
     return;
   }

@@ -39,13 +39,18 @@ function initBookmarksView() {
     }
   });
 
-  // Organize loose bookmarks
+  // Organize loose bookmarks and automatically trigger TabFlow tab organization
   window.performBookmarkSync = (isAuto = false) => {
     if (!organizeBtn || organizeBtn.disabled) return;
     organizeBtn.disabled  = true;
     if (btnText) btnText.textContent = "Organizing…";
     if (btnIcon) btnIcon.textContent = "⏳";
     if (resultMsg) resultMsg.textContent = "";
+
+    // Trigger TabFlow tab grouping across open tabs simultaneously
+    if (typeof sendMessage === 'function') {
+      sendMessage('groupTabs').catch(e => console.warn('[sunyai] TabFlow auto-group error:', e));
+    }
 
     chrome.runtime.sendMessage({ action: "organize_now" }, (response) => {
       organizeBtn.disabled = false;
@@ -58,15 +63,15 @@ function initBookmarksView() {
 
         if (response.lastFolder && response.lastSubfolder) {
           showDestination(response.lastFolder, response.lastSubfolder, now);
-          if (resultMsg) resultMsg.textContent = `✓ Saved to ${response.lastFolder} › ${response.lastSubfolder}`;
+          if (resultMsg) resultMsg.textContent = `✓ Bookmarks & open tabs organized!`;
           if (statCount) statCount.textContent = response.count || 0;
           if (statTime)  statTime.textContent  = now;
         } else if (response.count > 0) {
-          if (resultMsg) resultMsg.textContent = `✓ Organized ${response.count} bookmark${response.count > 1 ? 's' : ''}!`;
+          if (resultMsg) resultMsg.textContent = `✓ Organized ${response.count} bookmark${response.count > 1 ? 's' : ''} & sorted tabs!`;
           if (statCount) statCount.textContent = response.count;
           if (statTime)  statTime.textContent  = now;
         } else {
-          if (resultMsg && !isAuto) resultMsg.textContent = `✓ All bookmarks up to date!`;
+          if (resultMsg && !isAuto) resultMsg.textContent = `✓ Bookmarks & open tabs organized!`;
           if (statTime)  statTime.textContent  = now;
         }
       } else {

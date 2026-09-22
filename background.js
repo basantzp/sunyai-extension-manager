@@ -297,6 +297,15 @@ async function bookmarkGroup(groupId) {
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "organize_now" || request.action === "auto_sweep") {
+    // Autonomous synergy: sort open tabs into domain groups alongside bookmark reorganization
+    try {
+      if (typeof app !== 'undefined' && app && app.tabGroupService) {
+        app.tabGroupService.groupTabsByCategory().catch((e) => console.warn('[sunyai] tab grouping error:', e));
+      }
+    } catch (e) {
+      console.warn('[sunyai] tab grouping trigger error:', e);
+    }
+
     sweepLooseBookmarks().then((res) => {
       sendResponse({
         success: true,

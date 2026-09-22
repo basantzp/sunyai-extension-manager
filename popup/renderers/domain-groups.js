@@ -7,11 +7,11 @@ function renderDomainGroups(data) {
 
   const shortcutsHtml = `
     <div class="shortcuts-hint">
-      <span><kbd>j</kbd> / <kbd>k</kbd> Navigate</span>
-      <span><kbd>Enter</kbd> Select</span>
-      <span><kbd>/</kbd> or <kbd>i</kbd> Search</span>
-      <span><kbd>Esc</kbd> Exit / Close</span>
-      <span><kbd>Alt+T</kbd> Open TabFlow</span>
+      <span><kbd>j</kbd><kbd>k</kbd> Nav</span>
+      <span><kbd>↵</kbd> Select</span>
+      <span><kbd>/</kbd> Search</span>
+      <span><kbd>Esc</kbd> Close</span>
+      <span><kbd>Alt+T</kbd> TabFlow</span>
     </div>
   `;
 
