@@ -33,10 +33,6 @@ tabBtns.forEach(btn => {
       if (typeof refreshBookmarkStatus === 'function') {
         refreshBookmarkStatus();
       }
-    } else if (tabName === 'settings') {
-      if (typeof searchBar !== 'undefined' && searchBar) searchBar.style.display = 'none';
-      if (typeof exitSearch === 'function') exitSearch();
-      loadConfigGroups();
     }
   });
 });

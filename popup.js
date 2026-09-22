@@ -87,16 +87,13 @@ document.addEventListener('keydown', (e) => {
     return;
   }
 
-  // Quick tab navigation: 1 for Tabs, 2 for Bookmarks, 3 for Rules
+  // Quick tab navigation: 1 for Tabs, 2 for Bookmarks
   if (!modalOverlay?.classList.contains('open') && !conflictModalOverlay?.classList.contains('open')) {
     if (e.key === '1') {
       document.getElementById('tabNavTabs')?.click();
       return;
     } else if (e.key === '2') {
       document.getElementById('tabNavBookmarks')?.click();
-      return;
-    } else if (e.key === '3') {
-      document.getElementById('tabNavSettings')?.click();
       return;
     }
   }

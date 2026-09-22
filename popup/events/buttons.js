@@ -1,78 +1,84 @@
-resetGroupsBtn.addEventListener('click', async () => {
-  if (!confirm('Reset all groups to defaults? This cannot be undone.')) return;
+if (resetGroupsBtn) {
+  resetGroupsBtn.addEventListener('click', async () => {
+    if (!confirm('Reset all groups to defaults? This cannot be undone.')) return;
 
-  try {
-    const result = await sendMessage('resetGroups');
-    if (result.success) {
-      showStatus('Groups reset to defaults', 'success');
-      await loadConfigGroups();
-    } else {
-      showStatus(result.message || 'Failed to reset', 'error');
+    try {
+      const result = await sendMessage('resetGroups');
+      if (result.success) {
+        showStatus('Groups reset to defaults', 'success');
+        if (typeof loadConfigGroups === 'function') await loadConfigGroups();
+      } else {
+        showStatus(result.message || 'Failed to reset', 'error');
+      }
+    } catch (e) {
+      showStatus('Error: ' + e.message, 'error');
     }
-  } catch (e) {
-    showStatus('Error: ' + e.message, 'error');
-  }
-});
+  });
+}
 
-sortNowBtn.addEventListener('click', async () => {
-  try {
-    // Switch to tabs view to show loading state and grouped tabs
-    const tabNavTabs = document.getElementById('tabNavTabs');
-    if (tabNavTabs) {
-      tabNavTabs.click();
-    } else if (settingsPanel && settingsPanel.classList.contains('open')) {
-      settingsPanel.classList.remove('open');
-    }
-    
-    // Show loading spinner immediately
-    groupsList.innerHTML = `
-      <div class="loading-container">
-        <div class="loading-spinner"></div>
-        <div class="loading-text">Sorting tabs into groups...</div>
-      </div>
-    `;
-    
-    const result = await sendMessage('groupTabs');
-    if (result.success) {
-      showStatus(`Grouped ${result.groupedCount} domain${result.groupedCount !== 1 ? 's' : ''}`, 'success');
-      // Update the toggle state to reflect that grouping is now enabled
-      groupToggle.checked = true;
-      expandAllBtn.style.display = '';
-      // Refresh the active groups view to show newly created tab groups
-      await loadActiveGroups();
-    } else {
-      showStatus(result.message || 'Failed', 'error');
-      // Show empty state on failure
+if (sortNowBtn) {
+  sortNowBtn.addEventListener('click', async () => {
+    try {
+      // Switch to tabs view to show loading state and grouped tabs
+      const tabNavTabs = document.getElementById('tabNavTabs');
+      if (tabNavTabs) {
+        tabNavTabs.click();
+      } else if (settingsPanel && settingsPanel.classList.contains('open')) {
+        settingsPanel.classList.remove('open');
+      }
+      
+      // Show loading spinner immediately
+      groupsList.innerHTML = `
+        <div class="loading-container">
+          <div class="loading-spinner"></div>
+          <div class="loading-text">Sorting tabs into groups...</div>
+        </div>
+      `;
+      
+      const result = await sendMessage('groupTabs');
+      if (result.success) {
+        showStatus(`Grouped ${result.groupedCount} domain${result.groupedCount !== 1 ? 's' : ''}`, 'success');
+        // Update the toggle state to reflect that grouping is now enabled
+        groupToggle.checked = true;
+        expandAllBtn.style.display = '';
+        // Refresh the active groups view to show newly created tab groups
+        await loadActiveGroups();
+      } else {
+        showStatus(result.message || 'Failed', 'error');
+        // Show empty state on failure
+        groupsList.innerHTML = `
+          <div class="empty-state">
+            <p>Failed to sort tabs</p>
+            <p style="font-size:11px;margin-top:4px;">${result.message || 'Try again'}</p>
+          </div>
+        `;
+      }
+    } catch (e) {
+      showStatus('Error: ' + e.message, 'error');
       groupsList.innerHTML = `
         <div class="empty-state">
-          <p>Failed to sort tabs</p>
-          <p style="font-size:11px;margin-top:4px;">${result.message || 'Try again'}</p>
+          <p>Error sorting tabs</p>
+          <p style="font-size:11px;margin-top:4px;">${e.message}</p>
         </div>
       `;
     }
-  } catch (e) {
-    showStatus('Error: ' + e.message, 'error');
-    groupsList.innerHTML = `
-      <div class="empty-state">
-        <p>Error sorting tabs</p>
-        <p style="font-size:11px;margin-top:4px;">${e.message}</p>
-      </div>
-    `;
-  }
-});
+  });
+}
 
-ungroupBtn.addEventListener('click', async () => {
-  try {
-    const result = await sendMessage('ungroupAll');
-    if (result.success) {
-      showStatus(`Ungrouped ${result.ungroupedCount} tab${result.ungroupedCount !== 1 ? 's' : ''}`, 'success');
-    } else {
-      showStatus(result.message || 'Failed', 'error');
+if (ungroupBtn) {
+  ungroupBtn.addEventListener('click', async () => {
+    try {
+      const result = await sendMessage('ungroupAll');
+      if (result.success) {
+        showStatus(`Ungrouped ${result.ungroupedCount} tab${result.ungroupedCount !== 1 ? 's' : ''}`, 'success');
+      } else {
+        showStatus(result.message || 'Failed', 'error');
+      }
+    } catch (e) {
+      showStatus('Error: ' + e.message, 'error');
     }
-  } catch (e) {
-    showStatus('Error: ' + e.message, 'error');
-  }
-});
+  });
+}
 
 expandAllBtn.addEventListener('click', async () => {
   try {

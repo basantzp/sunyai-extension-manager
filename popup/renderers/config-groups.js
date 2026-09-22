@@ -1,4 +1,5 @@
 function renderConfigGroups() {
+  if (!configGroupsList) return;
   // Settings panel ALWAYS shows full info for clarity
   // Display mode ONLY affects Chrome tab groups, not settings
   if (configGroups.length === 0) {

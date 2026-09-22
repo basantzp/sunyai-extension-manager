@@ -27,8 +27,8 @@ function getNavItems() {
         });
       });
     } else {
-      items.push({ el: groupToggle, type: 'toggle' });
-      items.push({ el: settingsIcon, type: 'settings-icon' });
+      if (groupToggle) items.push({ el: groupToggle, type: 'toggle' });
+      if (settingsIcon) items.push({ el: settingsIcon, type: 'settings-icon' });
 
       document.querySelectorAll('.domain-group-card').forEach(card => {
         const header = card.querySelector('.domain-group-header');

@@ -17,7 +17,6 @@
       <div class="tab-nav">
         <button class="tab-btn active" data-tab="home" id="tabNavTabs">Tabs</button>
         <button class="tab-btn" data-tab="bookmarks" id="tabNavBookmarks">Bookmarks</button>
-        <button class="tab-btn" data-tab="settings" id="tabNavSettings">Rules</button>
       </div>
     </div>
 
@@ -123,113 +122,6 @@
         </details>
       </div>
     </div>
-
-    <!-- 3. RULES & SETTINGS VIEW (Minimal: Domain Rules + 1-Click Actions) -->
-    <div class="tab-content" id="settingsTab">
-      <div class="settings-content">
-        <!-- Tab Domain Rules Section -->
-        <div class="settings-section">
-          <div class="section-header">
-            <div class="section-title">
-              <svg class="section-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
-                <line x1="12" y1="11" x2="12" y2="17"/>
-                <line x1="9" y1="14" x2="15" y2="14"/>
-              </svg>
-              <h3>Tab Domain Rules</h3>
-            </div>
-            <button class="btn btn-primary btn-sm" id="addGroupBtn">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="12" y1="5" x2="12" y2="19"/>
-                <line x1="5" y1="12" x2="19" y2="12"/>
-              </svg>
-              New Rule
-            </button>
-          </div>
-          <div id="configGroupsList"></div>
-
-          <!-- Minimal Actions Bar -->
-          <div class="settings-actions-minimal">
-            <button class="settings-btn-minimal" id="sortNowBtn">
-              🗂️ Sort Tabs Now
-            </button>
-            <button class="settings-btn-minimal" id="ungroupBtn">
-              Ungroup All Tabs
-            </button>
-            <button class="settings-btn-minimal danger" id="resetGroupsBtn">
-              Reset Rules to Defaults
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Create/Edit Group Modal -->
-  <div class="modal-overlay" id="modalOverlay">
-    <div class="modal">
-      <div class="modal-header">
-        <h3 id="modalTitle">New Group</h3>
-        <button class="modal-close" id="modalClose">&times;</button>
-      </div>
-      <div class="modal-body">
-        <div class="form-group">
-          <label for="groupName">Group Name</label>
-          <input type="text" id="groupName" placeholder="e.g. GITHUB, NEPAL NEWS, AI">
-        </div>
-        <div class="form-group">
-          <label for="groupEmoji">Icon (Emoji)</label>
-          <div class="emoji-input-wrapper">
-            <input type="text" id="groupEmoji" placeholder="🌐" maxlength="2" class="emoji-input">
-            <div class="emoji-quick-select">
-              <span class="emoji-option" data-emoji="🇳🇵">🇳🇵</span>
-              <span class="emoji-option" data-emoji="📈">📈</span>
-              <span class="emoji-option" data-emoji="🤖">🤖</span>
-              <span class="emoji-option" data-emoji="💻">💻</span>
-              <span class="emoji-option" data-emoji="🔧">🔧</span>
-              <span class="emoji-option" data-emoji="💬">💬</span>
-              <span class="emoji-option" data-emoji="📧">📧</span>
-              <span class="emoji-option" data-emoji="📹">📹</span>
-              <span class="emoji-option" data-emoji="📋">📋</span>
-              <span class="emoji-option" data-emoji="🛒">🛒</span>
-              <span class="emoji-option" data-emoji="🎨">🎨</span>
-              <span class="emoji-option" data-emoji="📄">📄</span>
-              <span class="emoji-option" data-emoji="📊">📊</span>
-              <span class="emoji-option" data-emoji="🌐">🌐</span>
-              <span class="emoji-option" data-emoji="🔒">🔒</span>
-              <span class="emoji-option" data-emoji="🎮">🎮</span>
-            </div>
-          </div>
-          <p class="form-hint">Click an emoji above or paste/type your own</p>
-        </div>
-        <div class="form-group">
-          <label for="groupDomains">Domains</label>
-          <textarea id="groupDomains" placeholder="github.com&#10;github.io"></textarea>
-          <p class="form-hint">One domain per line. Subdomains match automatically.</p>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-ghost" id="modalCancel">Cancel</button>
-        <button class="btn btn-primary" id="modalSave">Save</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Domain Conflict Modal -->
-  <div class="modal-overlay" id="conflictModalOverlay">
-    <div class="conflict-modal">
-      <div class="conflict-header">
-        <span class="conflict-icon">&#9888;</span>
-        <h3>Domain Conflict Detected</h3>
-      </div>
-      <div class="conflict-body" id="conflictBody"></div>
-      <div class="conflict-footer">
-        <div class="conflict-footer-left">
-          <button class="btn btn-ghost" id="conflictCancel">Cancel</button>
-        </div>
-        <button class="btn btn-primary" id="conflictConfirm">Move &amp; Save</button>
-      </div>
-    </div>
   </div>
 
   <!-- Scripts -->
@@ -239,19 +131,14 @@
   <script src="popup/renderers/active-groups.js"></script>
   <script src="popup/renderers/domain-groups.js"></script>
   <script src="popup/renderers/search-results.js"></script>
-  <script src="popup/renderers/config-groups.js"></script>
-  <script src="popup/modals.js"></script>
   <script src="popup/loaders.js"></script>
-  <script src="popup/crud.js"></script>
   <script src="popup/search.js"></script>
   <script src="popup/navigation/collection.js"></script>
   <script src="popup/navigation/selection.js"></script>
   <script src="popup/navigation/activation.js"></script>
   <script src="popup/events/groups.js"></script>
   <script src="popup/events/search.js"></script>
-  <script src="popup/events/config.js"></script>
   <script src="popup/events/panel.js"></script>
-  <script src="popup/events/modals.js"></script>
   <script src="popup/events/buttons.js"></script>
   <script src="popup/events/search-input.js"></script>
   <script src="popup/focus-mode.js"></script>

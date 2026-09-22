@@ -1,38 +1,46 @@
-addGroupBtn.addEventListener('click', () => openModal('create'));
-modalClose.addEventListener('click', closeModal);
-modalCancel.addEventListener('click', closeModal);
-modalSave.addEventListener('click', handleSave);
+if (addGroupBtn) addGroupBtn.addEventListener('click', () => openModal('create'));
+if (modalClose) modalClose.addEventListener('click', closeModal);
+if (modalCancel) modalCancel.addEventListener('click', closeModal);
+if (modalSave) modalSave.addEventListener('click', handleSave);
 
-modalOverlay.addEventListener('click', (e) => {
-  if (e.target === modalOverlay) closeModal();
-});
+if (modalOverlay) {
+  modalOverlay.addEventListener('click', (e) => {
+    if (e.target === modalOverlay) closeModal();
+  });
+}
 
-groupNameInput.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') handleSave();
-});
+if (groupNameInput) {
+  groupNameInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') handleSave();
+  });
+}
 
-conflictCancel.addEventListener('click', closeConflictModal);
-conflictConfirm.addEventListener('click', async () => {
-  if (!pendingSave) return;
+if (conflictCancel) conflictCancel.addEventListener('click', closeConflictModal);
+if (conflictConfirm) {
+  conflictConfirm.addEventListener('click', async () => {
+    if (!pendingSave) return;
 
-  const { name, domains } = pendingSave;
-  closeConflictModal();
+    const { name, domains } = pendingSave;
+    closeConflictModal();
 
-  try {
-    await sendMessage('moveDomainsToGroup', {
-      groupName: name,
-      domains
-    });
+    try {
+      await sendMessage('moveDomainsToGroup', {
+        groupName: name,
+        domains
+      });
 
-    closeModal();
-    await loadConfigGroups();
-    showStatus('Domains moved and group saved', 'success');
-  } catch (e) {
-    closeModal();
-    showStatus('Error: ' + e.message, 'error');
-  }
-});
+      closeModal();
+      if (typeof loadConfigGroups === 'function') await loadConfigGroups();
+      showStatus('Domains moved and group saved', 'success');
+    } catch (e) {
+      closeModal();
+      showStatus('Error: ' + e.message, 'error');
+    }
+  });
+}
 
-conflictModalOverlay.addEventListener('click', (e) => {
-  if (e.target === conflictModalOverlay) closeConflictModal();
-});
+if (conflictModalOverlay) {
+  conflictModalOverlay.addEventListener('click', (e) => {
+    if (e.target === conflictModalOverlay) closeConflictModal();
+  });
+}
