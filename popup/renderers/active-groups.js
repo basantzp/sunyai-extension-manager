@@ -9,7 +9,6 @@ function renderActiveGroups(data) {
     <div class="shortcuts-hint">
       <span><kbd>j</kbd><kbd>k</kbd> Nav</span>
       <span><kbd>↵</kbd> Select</span>
-      <span><kbd>/</kbd> Search</span>
       <span><kbd>Esc</kbd> Close</span>
       <span><kbd>Alt+H/L</kbd> Group</span>
       <span><kbd>Alt+E</kbd> Toggle</span>

@@ -33,7 +33,6 @@ if (groupToggle) {
     }
 
     groupToggle.disabled = false;
-    if (searchInput) searchInput.focus();
   });
 }
 
@@ -102,12 +101,7 @@ document.addEventListener('keydown', (e) => {
   const homeTab = document.getElementById('homeTab');
   const isHomeTabActive = homeTab && homeTab.classList.contains('active');
 
-  if (e.key === '/' || e.key === 'i' || e.key === 'I') {
-    if (isHomeTabActive) {
-      e.preventDefault();
-      if (typeof enterSearch === 'function') enterSearch();
-    }
-  } else if (e.key === 'j' || e.key === 'J' || e.key === 'ArrowDown') {
+  if (e.key === 'j' || e.key === 'J' || e.key === 'ArrowDown') {
     e.preventDefault();
     if (typeof getNavItems === 'function' && typeof selectItem === 'function') {
       const items = getNavItems();
@@ -198,7 +192,6 @@ document.addEventListener('keydown', (e) => {
   }
 
   requestAnimationFrame(() => {
-    if (searchInput) searchInput.focus();
     if (typeof selectItem === 'function') selectItem(0);
   });
 

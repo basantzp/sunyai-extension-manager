@@ -9,7 +9,6 @@ function renderDomainGroups(data) {
     <div class="shortcuts-hint">
       <span><kbd>j</kbd><kbd>k</kbd> Nav</span>
       <span><kbd>↵</kbd> Select</span>
-      <span><kbd>/</kbd> Search</span>
       <span><kbd>Esc</kbd> Close</span>
       <span><kbd>Alt+T</kbd> TabFlow</span>
     </div>
