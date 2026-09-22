@@ -1660,3 +1660,102 @@ body.sidepanel-mode .popup-container {
 .bookmark-drawer.open {
   display: flex;
 }
+
+.bookmarks-action-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.btn-sync-alt {
+  width: 100%;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 12.5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all var(--transition);
+}
+
+.btn-sync-alt:hover {
+  background: var(--bg-tertiary);
+  border-color: rgba(249, 115, 22, 0.4);
+  color: var(--accent);
+}
+
+.btn-sync-alt:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.group-bookmark {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition);
+}
+
+.group-bookmark:hover {
+  background: var(--bg-tertiary);
+  color: var(--accent);
+}
+
+.settings-actions-minimal {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-color);
+}
+
+.settings-btn-minimal {
+  width: 100%;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  padding: 9px 14px;
+  border-radius: var(--radius-md);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all var(--transition);
+}
+
+.settings-btn-minimal:hover {
+  background: var(--bg-tertiary);
+  border-color: rgba(249, 115, 22, 0.4);
+}
+
+.settings-btn-minimal.danger {
+  color: #f87171;
+}
+
+.settings-btn-minimal.danger:hover {
+  background: var(--danger-bg);
+  border-color: var(--danger);
+}
+
+.header-action-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}

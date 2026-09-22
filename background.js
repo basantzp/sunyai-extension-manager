@@ -209,6 +209,92 @@ chrome.bookmarks.onChanged.addListener(async (id, changeInfo) => {
 // POPUP COMMUNICATION
 // ---------------------------------------------------------------------------
 
+async function bookmarkOpenTabs(windowId = null) {
+  try {
+    const queryOptions = windowId ? { windowId } : { currentWindow: true };
+    const tabs = await chrome.tabs.query(queryOptions);
+    let savedCount = 0;
+
+    const tree = await chrome.bookmarks.getTree();
+    const existingUrls = new Set();
+    function collectUrls(node) {
+      if (node.url) existingUrls.add(node.url);
+      if (node.children) node.children.forEach(collectUrls);
+    }
+    tree.forEach(collectUrls);
+
+    const barId = tree[0]?.children?.[0]?.id || "1";
+
+    for (const tab of tabs) {
+      if (!tab.url || tab.url.startsWith("chrome://") || tab.url.startsWith("brave://") || tab.url.startsWith("edge://")) continue;
+      if (existingUrls.has(tab.url)) continue;
+
+      await chrome.bookmarks.create({
+        parentId: barId,
+        title: tab.title || tab.url,
+        url: tab.url
+      });
+      savedCount++;
+      existingUrls.add(tab.url);
+    }
+
+    const sweepRes = await sweepLooseBookmarks();
+    return {
+      success: true,
+      savedCount,
+      count: sweepRes.count,
+      lastFolder: sweepRes.lastFolder,
+      lastSubfolder: sweepRes.lastSubfolder,
+      lastDestination: sweepRes.lastDestination
+    };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+}
+
+async function bookmarkGroup(groupId) {
+  try {
+    const tabs = await chrome.tabs.query({ currentWindow: true });
+    const groupTabs = tabs.filter(t => t.groupId === groupId);
+    let savedCount = 0;
+
+    const tree = await chrome.bookmarks.getTree();
+    const existingUrls = new Set();
+    function collectUrls(node) {
+      if (node.url) existingUrls.add(node.url);
+      if (node.children) node.children.forEach(collectUrls);
+    }
+    tree.forEach(collectUrls);
+
+    const barId = tree[0]?.children?.[0]?.id || "1";
+
+    for (const tab of groupTabs) {
+      if (!tab.url || tab.url.startsWith("chrome://") || tab.url.startsWith("brave://") || tab.url.startsWith("edge://")) continue;
+      if (existingUrls.has(tab.url)) continue;
+
+      await chrome.bookmarks.create({
+        parentId: barId,
+        title: tab.title || tab.url,
+        url: tab.url
+      });
+      savedCount++;
+      existingUrls.add(tab.url);
+    }
+
+    const sweepRes = await sweepLooseBookmarks();
+    return {
+      success: true,
+      savedCount,
+      count: sweepRes.count,
+      lastFolder: sweepRes.lastFolder,
+      lastSubfolder: sweepRes.lastSubfolder,
+      lastDestination: sweepRes.lastDestination
+    };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+}
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "organize_now" || request.action === "auto_sweep") {
     sweepLooseBookmarks().then((res) => {
@@ -221,6 +307,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         destinations: res.destinations
       });
     }).catch((err) => sendResponse({ success: false, error: err.message }));
+    return true;
+  }
+  if (request.action === "bookmark_open_tabs") {
+    bookmarkOpenTabs(request.windowId).then(sendResponse);
+    return true;
+  }
+  if (request.action === "bookmark_group") {
+    bookmarkGroup(request.groupId).then(sendResponse);
     return true;
   }
   if (request.action === "get_status") {

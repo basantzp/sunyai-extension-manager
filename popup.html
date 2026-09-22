@@ -17,7 +17,7 @@
       <div class="tab-nav">
         <button class="tab-btn active" data-tab="home" id="tabNavTabs">Tabs</button>
         <button class="tab-btn" data-tab="bookmarks" id="tabNavBookmarks">Bookmarks</button>
-        <button class="tab-btn" data-tab="settings" id="tabNavSettings">Settings</button>
+        <button class="tab-btn" data-tab="settings" id="tabNavSettings">Rules</button>
       </div>
     </div>
 
@@ -35,15 +35,16 @@
     <!-- 1. TABS VIEW -->
     <div class="tab-content active" id="homeTab">
       <div class="home-header">
-        <span class="home-title">Active Tabs &amp; Groups</span>
-        <div class="toggle-wrapper">
+        <span class="home-title">Active Tabs</span>
+        <div class="header-action-group">
+          <button class="btn btn-primary btn-sm" id="quickSortBtn" title="Sort open tabs into domain groups" style="padding: 4px 10px; font-size: 11px;">
+            🗂️ Sort Tabs
+          </button>
           <button class="btn btn-ghost btn-sm" id="expandAllBtn" title="Expand/Collapse All Groups">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
           </button>
-          <label class="switch" title="Auto-Group Tabs">
-            <input type="checkbox" id="groupToggle">
-            <span class="switch-slider"></span>
-          </label>
+          <!-- State-preserving hidden toggle -->
+          <input type="checkbox" id="groupToggle" checked style="display: none;">
         </div>
       </div>
       <div class="content" id="mainContent">
@@ -52,14 +53,20 @@
       </div>
     </div>
 
-    <!-- 2. BOOKMARKS VIEW -->
+    <!-- 2. BOOKMARKS VIEW (Minimal, Zero-API, Local Latency <1ms) -->
     <div class="tab-content" id="bookmarksTab">
       <div class="bookmarks-view-container">
-        <!-- Hero Organize Button -->
-        <button class="btn-sync" id="organizeBtn">
-          <span id="btnIcon">⚡</span>
-          <span id="btnText">Organize Now</span>
-        </button>
+        <!-- Dual Action Buttons -->
+        <div class="bookmarks-action-row">
+          <button class="btn-sync" id="organizeBtn" title="Instant sub-millisecond local categorization">
+            <span id="btnIcon">⚡</span>
+            <span id="btnText">Organize Bookmarks</span>
+          </button>
+          <button class="btn-sync-alt" id="bookmarkTabsBtn" title="Save all open tabs into categorized bookmarks">
+            <span>📥</span>
+            <span>Save &amp; Organize Open Tabs</span>
+          </button>
+        </div>
         <div class="result-msg" id="resultMsg"></div>
 
         <!-- Real-Time Destination Card -->
@@ -85,13 +92,13 @@
             <span class="stat-label">Bookmarks Sorted</span>
           </div>
           <div class="stat-chip">
-            <span class="stat-num" id="statTime">Active</span>
-            <span class="stat-label">Engine Latency: &lt;1ms</span>
+            <span class="stat-num" id="statTime">Local &lt;1ms</span>
+            <span class="stat-label">0% Background CPU</span>
           </div>
         </div>
 
         <!-- Category Matrix Header & Chips -->
-        <div class="category-chips-header">Smart Taxonomy Categories</div>
+        <div class="category-chips-header">Smart Taxonomy Matrix</div>
         <div class="category-chips">
           <span class="chip">🇳🇵 Nepal News</span>
           <span class="chip">📈 NEPSE &amp; Finance</span>
@@ -109,49 +116,13 @@
           <span class="chip">🌐 Social Media</span>
           <span class="chip">🛠️ Web Tools</span>
         </div>
-
-        <!-- Bookmark Settings Toggle Drawer -->
-        <div style="display: flex; justify-content: flex-end; margin-top: 6px;">
-          <button class="btn btn-ghost btn-sm" id="bookmarkSettingsToggle" style="font-size: 11px; color: var(--text-muted);">
-            ⚙️ AI &amp; Sync Preferences
-          </button>
-        </div>
-
-        <div class="bookmark-drawer" id="bookmarkSettingsPanel">
-          <div class="form-group">
-            <label for="apiKey" style="font-size: 11px;">OpenRouter API Key (Optional)</label>
-            <input type="text" id="apiKey" placeholder="Leave blank for local zero-API mode">
-          </div>
-          <div class="form-group">
-            <label for="model" style="font-size: 11px;">AI Model</label>
-            <select id="model" style="background: var(--bg-primary); border: 1px solid var(--border-color); color: var(--text-primary); padding: 6px; border-radius: var(--radius-sm); font-size: 11px;">
-              <option value="z-ai/glm-5.2:free">z-ai/glm-5.2:free</option>
-              <option value="nvidia/nemotron-3.5-lightning:free">nvidia/nemotron-3.5-lightning:free</option>
-              <option value="google/gemma-4-31b-it:free">google/gemma-4-31b-it:free</option>
-            </select>
-          </div>
-          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px;">
-            <span>Auto-organize on save</span>
-            <label class="switch">
-              <input type="checkbox" id="autoOrganize" checked>
-              <span class="switch-slider"></span>
-            </label>
-          </div>
-          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px;">
-            <span>Desktop notification</span>
-            <label class="switch">
-              <input type="checkbox" id="notify" checked>
-              <span class="switch-slider"></span>
-            </label>
-          </div>
-        </div>
       </div>
     </div>
 
-    <!-- 3. SETTINGS & RULES VIEW -->
+    <!-- 3. RULES & SETTINGS VIEW (Minimal: Domain Rules + 1-Click Actions) -->
     <div class="tab-content" id="settingsTab">
       <div class="settings-content">
-        <!-- Tab Groups CRUD Section -->
+        <!-- Tab Domain Rules Section -->
         <div class="settings-section">
           <div class="section-header">
             <div class="section-title">
@@ -167,177 +138,21 @@
                 <line x1="12" y1="5" x2="12" y2="19"/>
                 <line x1="5" y1="12" x2="19" y2="12"/>
               </svg>
-              New Group
+              New Rule
             </button>
           </div>
           <div id="configGroupsList"></div>
-        </div>
 
-        <!-- General Automation Settings -->
-        <div class="settings-section">
-          <div class="section-header">
-            <div class="section-title">
-              <svg class="section-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="3"/>
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-              </svg>
-              <h3>General Automation</h3>
-            </div>
-          </div>
-
-          <div class="settings-actions">
-            <!-- Side Panel Mode Toggle -->
-            <div class="settings-toggle-card">
-              <div class="toggle-card-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
-                  <line x1="8" y1="21" x2="16" y2="21"/>
-                  <line x1="12" y1="17" x2="12" y2="21"/>
-                </svg>
-              </div>
-              <div class="toggle-card-content">
-                <div class="toggle-card-info">
-                  <span class="toggle-card-title">Side Panel Mode</span>
-                  <span class="toggle-card-desc">Open sunyai extension manager in the browser sidebar</span>
-                </div>
-                <label class="switch">
-                  <input type="checkbox" id="uiModeToggle">
-                  <span class="switch-slider"></span>
-                </label>
-              </div>
-            </div>
-
-            <!-- Prevent Duplicate Tabs -->
-            <div class="settings-toggle-card">
-              <div class="toggle-card-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                  <line x1="9" y1="9" x2="15" y2="15"/>
-                  <line x1="15" y1="9" x2="9" y2="15"/>
-                </svg>
-              </div>
-              <div class="toggle-card-content">
-                <div class="toggle-card-info">
-                  <span class="toggle-card-title">Prevent Duplicate Tabs</span>
-                  <span class="toggle-card-desc">Auto-focus existing tabs instead of opening duplicates</span>
-                </div>
-                <label class="switch">
-                  <input type="checkbox" id="duplicatePreventionToggle">
-                  <span class="switch-slider"></span>
-                </label>
-              </div>
-            </div>
-
-            <!-- Group Unlisted Tabs -->
-            <div class="settings-toggle-card">
-              <div class="toggle-card-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
-                </svg>
-              </div>
-              <div class="toggle-card-content">
-                <div class="toggle-card-info">
-                  <span class="toggle-card-title">Group Unlisted Tabs</span>
-                  <span class="toggle-card-desc">Create OTHERS group for tabs not matching any rule</span>
-                </div>
-                <label class="switch">
-                  <input type="checkbox" id="groupUnlistedToggle">
-                  <span class="switch-slider"></span>
-                </label>
-              </div>
-            </div>
-
-            <!-- Auto-Collapse Inactive Groups -->
-            <div class="settings-toggle-card">
-              <div class="toggle-card-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="4 14 10 14 10 20"/>
-                  <polyline points="20 10 14 10 14 4"/>
-                  <line x1="14" y1="10" x2="21" y2="3"/>
-                  <line x1="3" y1="21" x2="10" y2="14"/>
-                </svg>
-              </div>
-              <div class="toggle-card-content">
-                <div class="toggle-card-info">
-                  <span class="toggle-card-title">Auto-Collapse Groups</span>
-                  <span class="toggle-card-desc">Automatically collapse inactive tab groups</span>
-                </div>
-                <label class="switch">
-                  <input type="checkbox" id="autoCollapseToggle">
-                  <span class="switch-slider"></span>
-                </label>
-              </div>
-            </div>
-
-            <!-- Tab Group Display Mode -->
-            <div class="settings-toggle-card">
-              <div class="toggle-card-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
-                  <line x1="8" y1="21" x2="16" y2="21"/>
-                  <line x1="12" y1="17" x2="12" y2="21"/>
-                </svg>
-              </div>
-              <div class="toggle-card-content">
-                <div class="toggle-card-info">
-                  <span class="toggle-card-title">Tab Group Display Mode</span>
-                  <span class="toggle-card-desc">Choose how tab group titles are formatted</span>
-                </div>
-                <select id="displayModeSelect" class="display-mode-select">
-                  <option value="icon+name+count">Icon + Name + Count</option>
-                  <option value="icon+name">Icon + Name</option>
-                  <option value="icon+count">Icon + Count</option>
-                  <option value="icon-only">Icon Only</option>
-                  <option value="name+count">Name + Count</option>
-                  <option value="name-only">Name Only</option>
-                  <option value="count-only">Count Only</option>
-                  <option value="count">Count</option>
-                </select>
-              </div>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="settings-divider"></div>
-
-            <button class="settings-action-btn" id="sortNowBtn">
-              <div class="action-btn-content">
-                <svg class="action-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="12" y1="5" x2="12" y2="19"/>
-                  <polyline points="19 12 12 19 5 12"/>
-                </svg>
-                <div class="action-btn-info">
-                  <span class="action-btn-title">Sort Tabs Now</span>
-                  <span class="action-btn-desc">Group all open tabs by domain rules</span>
-                </div>
-              </div>
+          <!-- Minimal Actions Bar -->
+          <div class="settings-actions-minimal">
+            <button class="settings-btn-minimal" id="sortNowBtn">
+              🗂️ Sort Tabs Now
             </button>
-
-            <button class="settings-action-btn" id="ungroupBtn">
-              <div class="action-btn-content">
-                <svg class="action-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="12" y1="19" x2="12" y2="5"/>
-                  <polyline points="5 12 12 5 19 12"/>
-                </svg>
-                <div class="action-btn-info">
-                  <span class="action-btn-title">Ungroup All Tabs</span>
-                  <span class="action-btn-desc">Remove all tab groupings</span>
-                </div>
-              </div>
+            <button class="settings-btn-minimal" id="ungroupBtn">
+              Ungroup All Tabs
             </button>
-
-            <div class="settings-divider"></div>
-
-            <button class="settings-action-btn danger" id="resetGroupsBtn">
-              <div class="action-btn-content">
-                <svg class="action-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="1 4 1 10 7 10"/>
-                  <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
-                </svg>
-                <div class="action-btn-info">
-                  <span class="action-btn-title">Reset to Defaults</span>
-                  <span class="action-btn-desc">Restore original Nepali &amp; global group configurations</span>
-                </div>
-              </div>
+            <button class="settings-btn-minimal danger" id="resetGroupsBtn">
+              Reset Rules to Defaults
             </button>
           </div>
         </div>

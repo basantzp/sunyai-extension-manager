@@ -37,6 +37,31 @@ if (groupToggle) {
   });
 }
 
+// Quick Sort Button in Header
+const quickSortBtn = document.getElementById('quickSortBtn');
+if (quickSortBtn) {
+  quickSortBtn.addEventListener('click', async () => {
+    quickSortBtn.disabled = true;
+    const oldText = quickSortBtn.textContent;
+    quickSortBtn.textContent = '⏳ Sorting…';
+    try {
+      const result = await sendMessage('groupTabs');
+      if (result.success) {
+        showStatus(`Grouped ${result.groupedCount} domain${result.groupedCount !== 1 ? 's' : ''}`, 'success');
+        if (groupToggle) groupToggle.checked = true;
+        if (expandAllBtn) expandAllBtn.style.display = '';
+        await loadActiveGroups();
+      } else {
+        showStatus(result.message || 'Failed', 'error');
+      }
+    } catch (e) {
+      showStatus('Error: ' + e.message, 'error');
+    }
+    quickSortBtn.disabled = false;
+    quickSortBtn.textContent = oldText;
+  });
+}
+
 // Keyboard shortcuts (Vim navigation + numeric tab switching)
 document.addEventListener('keydown', (e) => {
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
@@ -62,7 +87,7 @@ document.addEventListener('keydown', (e) => {
     return;
   }
 
-  // Quick tab navigation: 1 for Tabs, 2 for Bookmarks, 3 for Settings
+  // Quick tab navigation: 1 for Tabs, 2 for Bookmarks, 3 for Rules
   if (!modalOverlay?.classList.contains('open') && !conflictModalOverlay?.classList.contains('open')) {
     if (e.key === '1') {
       document.getElementById('tabNavTabs')?.click();
@@ -107,12 +132,12 @@ document.addEventListener('keydown', (e) => {
         selectItem((navIndex - 1 + items.length) % items.length);
       }
     }
-  } else if (e.key === 'l' || e.key === 'L' || e.key === 'Enter' || e.key === 'ArrowRight') {
+  } else if (e.key === 'l' || e.key === 'Enter' || e.key === 'ArrowRight') {
     e.preventDefault();
     if (typeof activateItem === 'function') {
       activateItem().catch(console.error);
     }
-  } else if (e.key === 'h' || e.key === 'H' || e.key === 'ArrowLeft') {
+  } else if (e.key === 'h' || e.key === 'ArrowLeft') {
     e.preventDefault();
     if (settingsPanel && (settingsPanel.classList.contains('open') || settingsPanel.classList.contains('active'))) {
       const homeTabBtn = document.getElementById('tabNavTabs');

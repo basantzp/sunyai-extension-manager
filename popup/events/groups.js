@@ -1,4 +1,10 @@
 groupsList.addEventListener('click', async (e) => {
+  if (e.target && e.target.id === 'emptySortBtn') {
+    if (typeof sortNowBtn !== 'undefined' && sortNowBtn) {
+      sortNowBtn.click();
+    }
+    return;
+  }
   const btn = e.target.closest('[data-action]');
   if (!btn) return;
 
@@ -29,6 +35,21 @@ groupsList.addEventListener('click', async (e) => {
       }
       showStatus('Tab closed', 'success');
     }
+  } else if (action === 'bookmark-group') {
+    e.stopPropagation();
+    const groupId = parseInt(btn.dataset.groupId);
+    btn.disabled = true;
+    btn.textContent = '⏳';
+    chrome.runtime.sendMessage({ action: 'bookmark_group', groupId }, (res) => {
+      btn.disabled = false;
+      btn.textContent = '📥';
+      if (res && res.success) {
+        showStatus(`Saved & organized ${res.savedCount || res.count || 0} bookmarks`, 'success');
+        if (typeof refreshBookmarkStatus === 'function') refreshBookmarkStatus();
+      } else {
+        showStatus(res?.error || 'Failed to bookmark group', 'error');
+      }
+    });
   } else if (action === 'close-group') {
     e.stopPropagation();
     const groupId = parseInt(btn.dataset.groupId);

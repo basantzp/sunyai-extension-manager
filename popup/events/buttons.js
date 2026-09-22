@@ -87,59 +87,65 @@ expandAllBtn.addEventListener('click', async () => {
   }
 });
 
-autoCollapseToggle.addEventListener('change', async () => {
-  try {
-    await sendMessage('setAutoCollapse', { enabled: autoCollapseToggle.checked });
-  } catch (e) {
-    showStatus('Error: ' + e.message, 'error');
-    autoCollapseToggle.checked = !autoCollapseToggle.checked;
-  }
-});
-
-duplicatePreventionToggle.addEventListener('change', async () => {
-  try {
-    const result = await sendMessage('setDuplicatePrevention', { enabled: duplicatePreventionToggle.checked });
-    if (result.cleanupPerformed && result.closedCount > 0) {
-      showStatus(`Closed ${result.closedCount} duplicate tab${result.closedCount !== 1 ? 's' : ''}`, 'success');
+if (autoCollapseToggle) {
+  autoCollapseToggle.addEventListener('change', async () => {
+    try {
+      await sendMessage('setAutoCollapse', { enabled: autoCollapseToggle.checked });
+    } catch (e) {
+      showStatus('Error: ' + e.message, 'error');
+      autoCollapseToggle.checked = !autoCollapseToggle.checked;
     }
-  } catch (e) {
-    showStatus('Error: ' + e.message, 'error');
-    duplicatePreventionToggle.checked = !duplicatePreventionToggle.checked;
-  }
-});
+  });
+}
 
-groupUnlistedToggle.addEventListener('change', async () => {
-  try {
-    await sendMessage('setGroupUnlisted', { enabled: groupUnlistedToggle.checked });
-    if (groupUnlistedToggle.checked) {
-      showStatus('Unlisted tabs will be grouped into OTHER', 'success');
-    } else {
-      showStatus('Unlisted tabs will not be grouped', 'success');
-    }
-  } catch (e) {
-    showStatus('Error: ' + e.message, 'error');
-    groupUnlistedToggle.checked = !groupUnlistedToggle.checked;
-  }
-});
-
-displayModeSelect.addEventListener('change', async () => {
-  try {
-    await sendMessage('setDisplayMode', { mode: displayModeSelect.value });
-    
-    const result = await sendMessage('updateGroupTitles');
-    
-    if (result.success) {
-      if (result.updatedCount > 0) {
-        showStatus(`✓ Display mode applied to browser tab bar! (${result.updatedCount} group${result.updatedCount !== 1 ? 's' : ''} updated)`, 'success');
-      } else {
-        showStatus(`Display mode saved. Sort tabs to see the effect.`, 'success');
+if (duplicatePreventionToggle) {
+  duplicatePreventionToggle.addEventListener('change', async () => {
+    try {
+      const result = await sendMessage('setDuplicatePrevention', { enabled: duplicatePreventionToggle.checked });
+      if (result.cleanupPerformed && result.closedCount > 0) {
+        showStatus(`Closed ${result.closedCount} duplicate tab${result.closedCount !== 1 ? 's' : ''}`, 'success');
       }
-    } else {
-      showStatus(`Error: ${result.message}`, 'error');
+    } catch (e) {
+      showStatus('Error: ' + e.message, 'error');
+      duplicatePreventionToggle.checked = !duplicatePreventionToggle.checked;
     }
-  } catch (e) {
-    showStatus('Error: ' + e.message, 'error');
-    const result = await sendMessage('getDisplayMode');
-    displayModeSelect.value = result.mode;
-  }
-});
+  });
+}
+
+if (groupUnlistedToggle) {
+  groupUnlistedToggle.addEventListener('change', async () => {
+    try {
+      await sendMessage('setGroupUnlisted', { enabled: groupUnlistedToggle.checked });
+      if (groupUnlistedToggle.checked) {
+        showStatus('Unlisted tabs will be grouped into OTHER', 'success');
+      } else {
+        showStatus('Unlisted tabs will not be grouped', 'success');
+      }
+    } catch (e) {
+      showStatus('Error: ' + e.message, 'error');
+      groupUnlistedToggle.checked = !groupUnlistedToggle.checked;
+    }
+  });
+}
+
+if (displayModeSelect) {
+  displayModeSelect.addEventListener('change', async () => {
+    try {
+      await sendMessage('setDisplayMode', { mode: displayModeSelect.value });
+      const result = await sendMessage('updateGroupTitles');
+      if (result.success) {
+        if (result.updatedCount > 0) {
+          showStatus(`✓ Display mode applied! (${result.updatedCount} group${result.updatedCount !== 1 ? 's' : ''} updated)`, 'success');
+        } else {
+          showStatus(`Display mode saved. Sort tabs to see the effect.`, 'success');
+        }
+      } else {
+        showStatus(`Error: ${result.message}`, 'error');
+      }
+    } catch (e) {
+      showStatus('Error: ' + e.message, 'error');
+      const result = await sendMessage('getDisplayMode');
+      displayModeSelect.value = result.mode;
+    }
+  });
+}

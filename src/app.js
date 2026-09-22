@@ -149,7 +149,8 @@ class TabSorterApp {
   setupMessageListeners() {
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       // Do not intercept bookmark organizer actions
-      if (message && (message.action === 'organize_now' || message.action === 'auto_sweep' || message.action === 'get_status')) {
+      const bookmarkActions = ['organize_now', 'auto_sweep', 'get_status', 'bookmark_open_tabs', 'bookmark_group'];
+      if (message && bookmarkActions.includes(message.action)) {
         return false;
       }
 

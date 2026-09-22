@@ -21,8 +21,8 @@ function renderActiveGroups(data) {
   if (groups.length === 0) {
     groupsList.innerHTML = `
       <div class="empty-state">
-        <p>No tab groups found</p>
-        <p style="font-size:11px;margin-top:4px;">Click "Sort Tabs Now" to organize tabs</p>
+        <p>No tab groups active</p>
+        <button class="btn btn-primary btn-sm" id="emptySortBtn" style="margin-top:10px;">Sort Tabs into Groups</button>
       </div>
       <div class="shortcuts-hint">
         <span><kbd>j</kbd> / <kbd>k</kbd> Navigate</span>
@@ -67,6 +67,7 @@ function renderActiveGroups(data) {
             <span class="group-badge">${group.tabs.length}</span>
           </div>
           <div class="group-header-actions">
+            <button class="group-bookmark" data-action="bookmark-group" data-group-id="${group.id}" title="Save & organize group into bookmarks">📥</button>
             <button class="group-close" data-action="close-group" data-group-id="${group.id}" title="Close group">×</button>
           </div>
         </div>
