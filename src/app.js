@@ -156,7 +156,7 @@ class TabSorterApp {
 
       (async () => {
         try {
-          const windowId = sender.tab?.windowId || null;
+          const windowId = message?.windowId || sender.tab?.windowId || null;
           const result = await this.messageHandler.handle(message, { windowId });
           sendResponse(result);
         } catch (e) {

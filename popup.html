@@ -34,7 +34,14 @@
     <!-- 1. TABS VIEW -->
     <div class="tab-content active" id="homeTab">
       <div class="home-header">
-        <span class="home-title">Active Tabs</span>
+        <div class="home-header-left">
+          <span class="home-title">Tabs</span>
+          <label class="tabflow-toggle-wrapper" title="Activate or deactivate TabFlow auto-grouping">
+            <input type="checkbox" id="groupToggle" checked>
+            <span class="tabflow-switch"></span>
+            <span class="tabflow-toggle-label">TabFlow</span>
+          </label>
+        </div>
         <div class="header-action-group">
           <button class="btn btn-primary btn-sm" id="quickSortBtn" title="Sort open tabs into domain groups" style="padding: 4px 10px; font-size: 11px;">
             🗂️ Sort Tabs
@@ -42,8 +49,6 @@
           <button class="btn btn-ghost btn-sm" id="expandAllBtn" title="Expand/Collapse All Groups">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
           </button>
-          <!-- State-preserving hidden toggle -->
-          <input type="checkbox" id="groupToggle" checked style="display: none;">
         </div>
       </div>
       <div class="content" id="mainContent">

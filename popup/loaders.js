@@ -42,20 +42,12 @@ async function loadActiveGroups() {
         selectItem(0);
       }
     } else {
-      groupsList.innerHTML = `
-        <div class="empty-state">
-          <p>Error loading groups</p>
-          <p style="font-size:11px;margin-top:4px;">${result.message || 'Unknown error'}</p>
-        </div>
-      `;
+      // Fallback gracefully to domain/flat tabs list rather than displaying an error card
+      await loadDomainGroups();
     }
   } catch (e) {
-    groupsList.innerHTML = `
-      <div class="empty-state">
-        <p>Error loading groups</p>
-        <p style="font-size:11px;margin-top:4px;">${e.message}</p>
-      </div>
-    `;
+    console.warn('[sunyai] loadActiveGroups error, falling back to loadDomainGroups:', e);
+    await loadDomainGroups();
   }
 }
 

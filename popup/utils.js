@@ -30,34 +30,38 @@ function showStatus(message, type) {
 }
 
 async function sendMessage(action, payload = {}, useActiveWindow = true) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const message = { action, ...payload };
     
-    if (useActiveWindow) {
-      chrome.windows.getLastFocused({ populate: false }, (window) => {
-        if (chrome.runtime.lastError) {
-          chrome.runtime.sendMessage(message, (response) => {
-            resolve(response || { success: false });
-          });
-          return;
-        }
-        message.windowId = window.id;
-        chrome.runtime.sendMessage(message, (response) => {
+    const sendWithFallback = (msg) => {
+      try {
+        chrome.runtime.sendMessage(msg, (response) => {
           if (chrome.runtime.lastError) {
-            reject(new Error(chrome.runtime.lastError.message));
+            console.warn('[sunyai] runtime message note:', chrome.runtime.lastError.message);
+            resolve({ success: false, message: chrome.runtime.lastError.message });
           } else {
             resolve(response || { success: false });
           }
         });
-      });
+      } catch (err) {
+        console.warn('[sunyai] runtime sendMessage exception:', err);
+        resolve({ success: false, message: err.message });
+      }
+    };
+
+    if (useActiveWindow && chrome.windows?.getLastFocused) {
+      try {
+        chrome.windows.getLastFocused({ populate: false }, (window) => {
+          if (!chrome.runtime.lastError && window?.id) {
+            message.windowId = window.id;
+          }
+          sendWithFallback(message);
+        });
+      } catch {
+        sendWithFallback(message);
+      }
     } else {
-      chrome.runtime.sendMessage(message, (response) => {
-        if (chrome.runtime.lastError) {
-          reject(new Error(chrome.runtime.lastError.message));
-        } else {
-          resolve(response || { success: false });
-        }
-      });
+      sendWithFallback(message);
     }
   });
 }
