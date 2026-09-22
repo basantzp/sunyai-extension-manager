@@ -97,8 +97,13 @@ function initBookmarksView() {
       if (bookmarkTabsBtn.disabled) return;
       bookmarkTabsBtn.disabled = true;
       const originalText = bookmarkTabsBtn.innerHTML;
-      bookmarkTabsBtn.innerHTML = `<span>⏳</span><span>Saving &amp; Organizing Tabs…</span>`;
+      bookmarkTabsBtn.innerHTML = `<span>⏳</span><span>Organizing Tabs…</span>`;
       if (resultMsg) resultMsg.textContent = "";
+
+      // Ensure TabFlow also organizes tabs into domain groups
+      if (typeof sendMessage === 'function') {
+        sendMessage('groupTabs').catch(() => {});
+      }
 
       chrome.runtime.sendMessage({ action: "bookmark_open_tabs" }, (res) => {
         bookmarkTabsBtn.disabled = false;
