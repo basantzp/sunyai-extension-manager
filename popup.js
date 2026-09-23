@@ -1,107 +1,220 @@
-document.addEventListener("DOMContentLoaded", async () => {
-  const organizeBtn = document.getElementById("organizeBtn");
-  const btnText = document.getElementById("btnText");
-  const btnIcon = document.getElementById("btnIcon");
-  const resultMsg = document.getElementById("resultMsg");
-  const settingsToggle = document.getElementById("settingsToggle");
-  const settingsPanel = document.getElementById("settingsPanel");
+// TabFlow Group Toggle
+if (groupToggle) {
+  groupToggle.addEventListener('change', async () => {
+    groupToggle.disabled = true;
+    if (expandAllBtn) expandAllBtn.style.display = groupToggle.checked ? '' : 'none';
 
-  const apiKeyInput = document.getElementById("apiKey");
-  const modelSelect = document.getElementById("model");
-  const autoOrganizeCheck = document.getElementById("autoOrganize");
-  const notifyCheck = document.getElementById("notify");
-
-  // Load saved settings
-  const settings = await chrome.storage.local.get({
-    apiKey: "",
-    model: "z-ai/glm-5.2:free",
-    autoOrganize: true,
-    notify: true
-  });
-
-  apiKeyInput.value = settings.apiKey || "";
-  modelSelect.value = settings.model || "z-ai/glm-5.2:free";
-  autoOrganizeCheck.checked = settings.autoOrganize !== false;
-  notifyCheck.checked = settings.notify !== false;
-
-  // Toggle settings panel visibility
-  settingsToggle.addEventListener("click", () => {
-    settingsPanel.classList.toggle("open");
-  });
-
-  // Auto-save setting changes
-  const saveSettings = () => {
-    chrome.storage.local.set({
-      apiKey: apiKeyInput.value.trim(),
-      model: modelSelect.value,
-      autoOrganize: autoOrganizeCheck.checked,
-      notify: notifyCheck.checked
-    });
-  };
-
-  apiKeyInput.addEventListener("change", saveSettings);
-  modelSelect.addEventListener("change", saveSettings);
-  autoOrganizeCheck.addEventListener("change", saveSettings);
-  notifyCheck.addEventListener("change", saveSettings);
-
-  const destCard = document.getElementById("destCard");
-  const destFolder = document.getElementById("destFolder");
-  const destSubfolder = document.getElementById("destSubfolder");
-
-  const updateDestinationUI = (folder, subfolder) => {
-    if (folder && subfolder) {
-      destFolder.textContent = folder;
-      destSubfolder.textContent = subfolder;
-      destCard.style.display = "block";
-    }
-  };
-
-  // Restore cached target on load
-  chrome.storage.local.get(["lastFolder", "lastSubfolder"], (data) => {
-    if (data && data.lastFolder && data.lastSubfolder) {
-      updateDestinationUI(data.lastFolder, data.lastSubfolder);
-    }
-  });
-
-  // Sync Manually & Autonomous Auto-Click Handler
-  const performSync = (isAuto = false) => {
-    organizeBtn.disabled = true;
-    btnText.textContent = "Syncing...";
-    btnIcon.textContent = "⏳";
-    resultMsg.textContent = "";
-
-    chrome.runtime.sendMessage({ action: "organize_now" }, (response) => {
-      organizeBtn.disabled = false;
-      btnText.textContent = "Sync Manually";
-      btnIcon.textContent = "⚡";
-
-      if (response && response.success) {
-        resultMsg.style.color = "var(--success)";
-        if (response.lastFolder && response.lastSubfolder) {
-          updateDestinationUI(response.lastFolder, response.lastSubfolder);
-          resultMsg.textContent = `✔ Pushed to folder: ${response.lastFolder} / subfolder: ${response.lastSubfolder}`;
-        } else if (response.lastDestination) {
-          resultMsg.textContent = `✔ Pushed to ${response.lastDestination}`;
-        } else if (response.count > 0) {
-          resultMsg.textContent = `✔ Pushed ${response.count} bookmarks to subfolders!`;
+    try {
+      if (groupToggle.checked) {
+        const result = await sendMessage('groupTabs');
+        if (result.success) {
+          showStatus(`Grouped ${result.groupedCount} domain${result.groupedCount !== 1 ? 's' : ''}`, 'success');
+          await loadActiveGroups();
         } else {
-          resultMsg.textContent = `✔ Pushed to clean folders!`;
+          // If service worker was asleep, reload silently instead of showing raw error
+          if (result.message && !result.message.includes('message port closed') && !result.message.includes('Waking up')) {
+            showStatus(result.message, 'error');
+          }
+          await loadActiveGroups();
         }
       } else {
-        resultMsg.style.color = "#ef4444";
-        resultMsg.textContent = `Notice: ${response?.error || "Up to date"}`;
+        const result = await sendMessage('ungroupAll');
+        if (result.success) {
+          showStatus(`Ungrouped ${result.ungroupedCount} tab${result.ungroupedCount !== 1 ? 's' : ''}`, 'success');
+          await loadDomainGroups();
+        } else {
+          if (result.message && !result.message.includes('message port closed') && !result.message.includes('Waking up')) {
+            showStatus(result.message, 'error');
+          }
+          await loadDomainGroups();
+        }
       }
+    } catch (e) {
+      if (!e.message?.includes('message port closed')) {
+        showStatus('Error: ' + e.message, 'error');
+      }
+    }
 
-      setTimeout(() => {
-        resultMsg.textContent = "";
-      }, 4000);
-    });
-  };
+    groupToggle.disabled = false;
+  });
+}
 
-  organizeBtn.addEventListener("click", () => performSync(false));
+// Quick Sort Button in Header
+const quickSortBtn = document.getElementById('quickSortBtn');
+if (quickSortBtn) {
+  quickSortBtn.addEventListener('click', async () => {
+    quickSortBtn.disabled = true;
+    const oldText = quickSortBtn.textContent;
+    quickSortBtn.textContent = '⏳ Sorting…';
+    try {
+      const result = await sendMessage('groupTabs');
+      if (result.success) {
+        showStatus(`Grouped ${result.groupedCount} domain${result.groupedCount !== 1 ? 's' : ''}`, 'success');
+        if (groupToggle) groupToggle.checked = true;
+        if (expandAllBtn) expandAllBtn.style.display = '';
+        await loadActiveGroups();
+      } else {
+        if (result.message && !result.message.includes('message port closed') && !result.message.includes('Waking up')) {
+          showStatus(result.message, 'error');
+        }
+        await loadActiveGroups();
+      }
+    } catch (e) {
+      if (!e.message?.includes('message port closed')) {
+        showStatus('Error: ' + e.message, 'error');
+      }
+    }
+    quickSortBtn.disabled = false;
+    quickSortBtn.textContent = oldText;
+  });
+}
 
-  // Autonomous Auto-Click on open: immediately execute sync manually!
-  setTimeout(() => {
-    performSync(true);
-  }, 120);
+// Keyboard shortcuts (Vim navigation + numeric tab switching)
+document.addEventListener('keydown', (e) => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+    if (e.target === searchInput && e.key === 'Escape') {
+      if (typeof exitSearch === 'function') exitSearch();
+    }
+    return;
+  }
+
+  if (e.key === 'Escape') {
+    if (modalOverlay && modalOverlay.classList.contains('open')) {
+      if (typeof closeModal === 'function') closeModal();
+    } else if (conflictModalOverlay && conflictModalOverlay.classList.contains('open')) {
+      if (typeof closeConflictModal === 'function') closeConflictModal();
+    } else if (searchActive) {
+      if (typeof exitSearch === 'function') exitSearch();
+    } else if (settingsPanel && (settingsPanel.classList.contains('open') || settingsPanel.classList.contains('active'))) {
+      const homeTabBtn = document.getElementById('tabNavTabs');
+      if (homeTabBtn) homeTabBtn.click();
+    } else if (focusedGroupId) {
+      if (typeof exitFocusMode === 'function') exitFocusMode();
+    }
+    return;
+  }
+
+  // Quick tab navigation: 1 for Tabs, 2 for Bookmarks
+  if (!modalOverlay?.classList.contains('open') && !conflictModalOverlay?.classList.contains('open')) {
+    if (e.key === '1') {
+      document.getElementById('tabNavTabs')?.click();
+      return;
+    } else if (e.key === '2') {
+      document.getElementById('tabNavBookmarks')?.click();
+      return;
+    }
+  }
+
+  // Only handle tab-list keyboard navigation when on the Tabs tab
+  const homeTab = document.getElementById('homeTab');
+  const isHomeTabActive = homeTab && homeTab.classList.contains('active');
+
+  if (e.key === 'j' || e.key === 'J' || e.key === 'ArrowDown') {
+    e.preventDefault();
+    if (typeof getNavItems === 'function' && typeof selectItem === 'function') {
+      const items = getNavItems();
+      if (items.length === 0) return;
+      if (navIndex < 0) {
+        selectItem(0);
+      } else {
+        selectItem((navIndex + 1) % items.length);
+      }
+    }
+  } else if (e.key === 'k' || e.key === 'K' || e.key === 'ArrowUp') {
+    e.preventDefault();
+    if (typeof getNavItems === 'function' && typeof selectItem === 'function') {
+      const items = getNavItems();
+      if (items.length === 0) return;
+      if (navIndex < 0) {
+        selectItem(items.length - 1);
+      } else {
+        selectItem((navIndex - 1 + items.length) % items.length);
+      }
+    }
+  } else if (e.key === 'l' || e.key === 'Enter' || e.key === 'ArrowRight') {
+    e.preventDefault();
+    if (typeof activateItem === 'function') {
+      activateItem().catch(console.error);
+    }
+  } else if (e.key === 'h' || e.key === 'ArrowLeft') {
+    e.preventDefault();
+    if (settingsPanel && (settingsPanel.classList.contains('open') || settingsPanel.classList.contains('active'))) {
+      const homeTabBtn = document.getElementById('tabNavTabs');
+      if (homeTabBtn) homeTabBtn.click();
+    } else if (modalOverlay && modalOverlay.classList.contains('open')) {
+      if (typeof closeModal === 'function') closeModal();
+    } else if (conflictModalOverlay && conflictModalOverlay.classList.contains('open')) {
+      if (typeof closeConflictModal === 'function') closeConflictModal();
+    } else if (searchActive) {
+      if (typeof exitSearch === 'function') exitSearch();
+    } else if (focusedGroupId) {
+      if (typeof exitFocusMode === 'function') exitFocusMode();
+    }
+  }
 });
+
+// Bootstrap on DOM load
+(async () => {
+  const isSidePanel = new URLSearchParams(window.location.search).get('context') === 'sidepanel';
+  if (isSidePanel) {
+    document.body.classList.add('sidepanel-mode');
+  } else {
+    document.body.classList.add('popup-mode');
+  }
+
+  // Initialize Bookmarks View logic
+  if (typeof initBookmarksView === 'function') {
+    initBookmarksView();
+  }
+
+  try {
+    const state = await sendMessage('getState');
+    if (groupToggle) groupToggle.checked = Boolean(state.enabled);
+
+    const autoCollapse = await sendMessage('getAutoCollapse');
+    if (autoCollapseToggle) autoCollapseToggle.checked = Boolean(autoCollapse.autoCollapse);
+
+    const duplicatePrevention = await sendMessage('getDuplicatePrevention');
+    if (duplicatePreventionToggle) duplicatePreventionToggle.checked = Boolean(duplicatePrevention.enabled);
+
+    const groupUnlisted = await sendMessage('getGroupUnlisted');
+    if (groupUnlistedToggle) groupUnlistedToggle.checked = Boolean(groupUnlisted.enabled);
+
+    const displayMode = await sendMessage('getDisplayMode');
+    if (displayModeSelect && displayMode.mode) displayModeSelect.value = displayMode.mode;
+
+    const uiMode = await sendMessage('getUiMode');
+    if (uiModeToggle) uiModeToggle.checked = uiMode.mode === 'sidepanel';
+  } catch (e) {
+    console.error('Failed to get settings:', e);
+  }
+
+  if (expandAllBtn && groupToggle) {
+    expandAllBtn.style.display = groupToggle.checked ? '' : 'none';
+  }
+
+  if (groupToggle && groupToggle.checked) {
+    await loadActiveGroups();
+  } else {
+    await loadDomainGroups();
+  }
+
+  requestAnimationFrame(() => {
+    if (typeof selectItem === 'function') selectItem(0);
+  });
+
+  // Background bookmark silent sweep on startup
+  setTimeout(() => {
+    if (typeof window.performBookmarkSync === 'function') {
+      window.performBookmarkSync(true);
+    }
+  }, 350);
+})();
+
+if (uiModeToggle) {
+  uiModeToggle.addEventListener('change', async () => {
+    const mode = uiModeToggle.checked ? 'sidepanel' : 'popup';
+    await sendMessage('setUiMode', { mode });
+    showStatus(`UI Mode switched to ${mode === 'sidepanel' ? 'Side Panel' : 'Popup'}. Click the extension icon to see changes.`, 'success');
+  });
+}

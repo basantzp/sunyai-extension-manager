@@ -9,7 +9,7 @@ The Chrome Web Store only accepts a `.zip` file containing extension runtime fil
 
 ```bash
 cd ~/.config/BraveSoftware/Brave-Browser/extensions/bookmark-organizer
-zip -r sunyai-bookmark-organizer.zip manifest.json background.js popup.html popup.js icons/ PRIVACY.md
+zip -r -FS sunyai-bookmark-organizer.zip manifest.json background.js popup.html popup.js icons/ PRIVACY.md CWS_SUBMISSION_GUIDE.md README.md
 ```
 *(A pre-packaged clean zip file is ready for you).*
 
@@ -18,19 +18,22 @@ zip -r sunyai-bookmark-organizer.zip manifest.json background.js popup.html popu
 ### 📋 2. Store Listing Details
 
 - **Extension Name:** `sunyai bookmark organizer`
+- **Version:** `1.2.0` (v3.0 Release)
 - **Short Description (max 132 characters):**
-  > Instantly and autonomously organizes bookmarks into intelligent categories and subfolders with zero battery drain.
+  > Autonomous bookmark organizer with Nepali-aware smart folders. Sub-millisecond, zero battery drain.
 - **Detailed Description:**
   ```markdown
-  sunyai bookmark organizer is an ultra-fast, zero-click extension that autonomously keeps your browser bookmarks tidy and structured.
+  sunyai bookmark organizer is an ultra-fast, zero-click extension that autonomously keeps your browser bookmarks tidy, structured, and intelligent.
 
   ⚡ KEY FEATURES:
   • Instant Organization (< 1ms): When you save a bookmark (Ctrl+D or star icon), it is automatically classified and moved into the appropriate Category and Subfolder within milliseconds.
-  • Smart 12-Folder Bar Protection: Preserves your Bookmark Bar by enforcing a 12-main-folder limit. When 12 categories exist, it uses high intelligence to organize new items into relevant subfolders rather than cluttering your bar.
-  • Overcrowded Folder Partitioning: Automatically divides overcrowded folders (6+ bookmarks) into clean sub-genres (e.g. Courses, Documentaries, Music Videos, Tools).
-  • Zero Background CPU: 100% event-driven. No polling alarms or background CPU usage, preserving maximum battery life.
-  • Visual Confirmation: Displays a discreet, floating pill on your screen ("Auto-synced to...") whenever an item is organized.
-  • 100% Private & Offline: Works entirely locally on your device with no required external accounts or API keys.
+  • Deep Nepali Intelligence: Automatically detects Devanagari script (Nepali), 35+ Nepali musical artists, Nepal news portals, e-commerce, banking, and NEPSE share market.
+  • YouTube 17-Subfolder Matrix: Intelligently separates Nepali music, Bollywood songs, English tracks, Nepali/English vlogs, comedy, documentaries, short films, courses, and tech reviews.
+  • Smart 15-Folder Bar Protection: Preserves your Bookmark Bar by enforcing a 15-main-folder limit. When 15 categories exist, it uses high intelligence to organize new items into relevant subfolders rather than cluttering your bar.
+  • Overcrowded Folder Partitioning: Automatically divides overcrowded folders (8+ bookmarks) into clean sub-genres.
+  • Zero Background CPU: 100% event-driven. Preserves maximum battery life.
+  • Visual Confirmation: Displays a discreet, floating breadcrumb pill on your screen ("⚡ Saved to Category › Subfolder") whenever an item is organized.
+  • 100% Private & Local: Works entirely locally on your device with no required external accounts or API keys.
   ```
 
 - **Category:** `Productivity`
@@ -49,9 +52,11 @@ When asked on the **Privacy Practices** tab in the Chrome Developer Dashboard, u
 | :--- | :--- |
 | `bookmarks` | Required to detect newly created or moved bookmarks and organize them into categorized folders. |
 | `storage` | Required to save user preferences such as notification toggles and auto-organize settings. |
+| `alarms` | Used to trigger periodic background cleanup sweeps. |
 | `notifications` | Used optionally to notify the user when bookmarks are successfully organized. |
 | `activeTab` | Used strictly to display a non-intrusive in-page confirmation pill on the active tab when a bookmark is auto-synced. |
 | `scripting` | Required to temporarily inject the visual confirmation toast pill into the active tab. |
+| `windows` | Required to detect initial browser window launch to execute startup bookmark sweeps. |
 | `https://openrouter.ai/*` | Optional host permission used only if the user explicitly configures their own AI API key. |
 
 #### Data Usage Answers:
