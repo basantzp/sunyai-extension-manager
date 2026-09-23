@@ -34,10 +34,9 @@ class CategoryConfiguration {
 
   async loadFromStorage() {
     try {
+      await this.loadDefaults();
       const result = await chrome.storage.sync.get('groups');
       if (result.groups && Array.isArray(result.groups) && result.groups.length > 0) {
-        this.categories = new Map();
-        this.emojiMap = new Map();
         for (const group of result.groups) {
           if (group.name && Array.isArray(group.domains) && group.domains.length > 0) {
             this.categories.set(group.name.toUpperCase(), group.domains.map(d => d.toLowerCase()));
@@ -47,11 +46,6 @@ class CategoryConfiguration {
             }
           }
         }
-        if (this.categories.size === 0) {
-          await this.resetToDefaults();
-        }
-      } else {
-        await this.loadDefaults();
       }
     } catch (error) {
       console.error('[CategoryConfiguration] Failed to load from storage:', error);

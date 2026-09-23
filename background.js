@@ -125,12 +125,18 @@ async function showInPageToast(catName, subName) {
 chrome.runtime.onInstalled.addListener(async () => {
   const existing = await chrome.storage.local.get(null);
   await chrome.storage.local.set({ ...DEFAULT_SETTINGS, ...existing, autoOrganize: true });
+  await chrome.storage.sync.set({ enabled: true });
   if (chrome.alarms) {
     try { chrome.alarms.create("autonomous_sweep", { periodInMinutes: 1 }); } catch (e) {}
   }
   console.log("[sunyai v3.0] Engine initialized.");
   await refreshTaxonomy();
   await sweepLooseBookmarks();
+  try {
+    if (typeof app !== 'undefined' && app?.tabGroupService) {
+      await app.tabGroupService.groupTabsByCategory();
+    }
+  } catch (e) {}
 });
 
 chrome.runtime.onStartup.addListener(async () => {
@@ -139,6 +145,11 @@ chrome.runtime.onStartup.addListener(async () => {
   }
   await refreshTaxonomy();
   await sweepLooseBookmarks();
+  try {
+    if (typeof app !== 'undefined' && app?.tabGroupService) {
+      await app.tabGroupService.groupTabsByCategory();
+    }
+  } catch (e) {}
 });
 
 if (chrome.windows && chrome.windows.onCreated) {
@@ -211,6 +222,15 @@ chrome.bookmarks.onChanged.addListener(async (id, changeInfo) => {
 
 async function bookmarkOpenTabs(windowId = null) {
   try {
+    // Coordinate with TabFlow: organize open tabs into groups
+    try {
+      if (typeof app !== 'undefined' && app?.tabGroupService) {
+        await app.tabGroupService.groupTabsByCategory(windowId);
+      }
+    } catch (e) {
+      console.warn('[sunyai] error grouping tabs in bookmarkOpenTabs:', e);
+    }
+
     const queryOptions = windowId ? { windowId } : { currentWindow: true };
     const tabs = await chrome.tabs.query(queryOptions);
     let savedCount = 0;

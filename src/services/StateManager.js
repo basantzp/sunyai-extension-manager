@@ -38,7 +38,7 @@ class StateManager {
 
   async isEnabled() {
     const storage = await chrome.storage.sync.get(StateManager.STORAGE_KEYS.ENABLED);
-    return storage.enabled ?? false;
+    return storage.enabled ?? true;
   }
 
   async setEnabled(enabled) {

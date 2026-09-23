@@ -93,16 +93,20 @@ function initBookmarksView() {
 
   // Save all open tabs into bookmarks & organize
   if (bookmarkTabsBtn) {
-    bookmarkTabsBtn.addEventListener("click", () => {
+    bookmarkTabsBtn.addEventListener("click", async () => {
       if (bookmarkTabsBtn.disabled) return;
       bookmarkTabsBtn.disabled = true;
       const originalText = bookmarkTabsBtn.innerHTML;
       bookmarkTabsBtn.innerHTML = `<span>⏳</span><span>Organizing Tabs…</span>`;
       if (resultMsg) resultMsg.textContent = "";
 
-      // Ensure TabFlow also organizes tabs into domain groups
+      // Ensure TabFlow organizes open tabs into domain groups
       if (typeof sendMessage === 'function') {
-        sendMessage('groupTabs').catch(() => {});
+        try {
+          await sendMessage('groupTabs');
+        } catch (e) {
+          console.warn('[sunyai] groupTabs note:', e);
+        }
       }
 
       chrome.runtime.sendMessage({ action: "bookmark_open_tabs" }, (res) => {

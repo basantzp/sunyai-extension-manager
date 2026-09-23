@@ -18,12 +18,16 @@ TabGroupService.prototype.groupTabsByCategory = async function(windowId = null) 
     return { success: false, message: 'No valid URLs to group' };
   }
 
-  const windowIdToUse = windowId || (await chrome.windows.getLastFocused()).id;
+  const targetWin = await chrome.windows.getLastFocused({ windowTypes: ['normal'] }).catch(() => null);
+  const windowIdToUse = windowId || targetWin?.id || (await chrome.windows.getCurrent()).id;
   const existingGroups = await chrome.tabGroups.query({ windowId: windowIdToUse });
 
   const validGroupNames = new Set(
     this.config.categories.keys()
   );
+  for (const name of categoryMap.keys()) {
+    validGroupNames.add(name);
+  }
   const knownCategories = this.config.getAllCategories();
   const groupUnlisted = await this.stateManager.getGroupUnlisted();
 

@@ -230,9 +230,11 @@ class TabSorterApp {
 
   setupInstallListener() {
     chrome.runtime.onInstalled.addListener(async (details) => {
-      if (details.reason === 'install') {
-        await this.tabGroupService.groupTabsByCategory();
+      try {
         await this.stateManager.setEnabled(true);
+        await this.tabGroupService.groupTabsByCategory();
+      } catch (e) {
+        console.warn('[TabSorter] onInstalled setup note:', e);
       }
     });
   }
@@ -269,4 +271,7 @@ class TabSorterApp {
 }
 
 const app = new TabSorterApp();
+if (typeof self !== 'undefined') {
+  self.app = app;
+}
 app.initialize();

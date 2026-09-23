@@ -3,17 +3,44 @@ TabGroupService.prototype.buildCategoryMap = async function(tabs) {
   
   // Get all groups for longest prefix matching
   const groups = await this.groupManager.getGroups();
+  const unmappedTabs = [];
 
   for (const tab of tabs) {
+    if (!tab.url) continue;
     const matchResult = await this.findBestMatchingGroup(tab.url, groups);
-    if (!matchResult || !matchResult.groupName) continue;
-
-    const { groupName } = matchResult;
-    
-    if (!categoryMap.has(groupName)) {
-      categoryMap.set(groupName, []);
+    if (matchResult && matchResult.groupName && matchResult.groupName !== this.config.fallbackCategory) {
+      const { groupName } = matchResult;
+      
+      if (!categoryMap.has(groupName)) {
+        categoryMap.set(groupName, []);
+      }
+      categoryMap.get(groupName).push(tab.id);
+    } else {
+      unmappedTabs.push(tab);
     }
-    categoryMap.get(groupName).push(tab.id);
+  }
+
+  // Automatic domain-level grouping for unmapped tabs:
+  // If 2 or more tabs share the same domain (or groupUnlisted is enabled), group them by domain!
+  const domainTabMap = new Map();
+  for (const tab of unmappedTabs) {
+    if (!tab.url) continue;
+    const hostname = this.domainExtractor.extract(tab.url);
+    if (!hostname) continue;
+    let cleanDomain = hostname.toLowerCase().replace(/^www\./, '');
+    const parts = cleanDomain.split('.');
+    const brand = parts.length > 1 ? parts[parts.length - 2].toUpperCase() : cleanDomain.toUpperCase();
+    if (!domainTabMap.has(brand)) {
+      domainTabMap.set(brand, []);
+    }
+    domainTabMap.get(brand).push(tab.id);
+  }
+
+  const groupUnlisted = await this.stateManager.getGroupUnlisted();
+  for (const [brand, tabIds] of domainTabMap) {
+    if (tabIds.length >= 2 || groupUnlisted) {
+      categoryMap.set(brand, tabIds);
+    }
   }
 
   return categoryMap;

@@ -227,9 +227,109 @@
     ]
   },
   {
+    "id": "youtube",
+    "name": "YOUTUBE",
+    "emoji": "▶️",
+    "domains": [
+      "youtube.com",
+      "youtu.be",
+      "music.youtube.com"
+    ]
+  },
+  {
+    "id": "social",
+    "name": "SOCIAL",
+    "emoji": "🌐",
+    "domains": [
+      "linkedin.com",
+      "twitter.com",
+      "x.com",
+      "reddit.com",
+      "facebook.com",
+      "instagram.com",
+      "threads.net",
+      "bsky.app",
+      "discord.com",
+      "t.me",
+      "telegram.org",
+      "whatsapp.com"
+    ]
+  },
+  {
+    "id": "media",
+    "name": "STREAMING & MEDIA",
+    "emoji": "🎬",
+    "domains": [
+      "netflix.com",
+      "spotify.com",
+      "twitch.tv",
+      "soundcloud.com",
+      "vimeo.com",
+      "primevideo.com",
+      "disneyplus.com",
+      "hotstar.com"
+    ]
+  },
+  {
+    "id": "dev-practice",
+    "name": "DEV PRACTICE",
+    "emoji": "💡",
+    "domains": [
+      "leetcode.com",
+      "hackerrank.com",
+      "geeksforgeeks.org",
+      "w3schools.com",
+      "developer.mozilla.org",
+      "freecodecamp.org",
+      "codewars.com",
+      "codeforces.com"
+    ]
+  },
+  {
+    "id": "work",
+    "name": "WORK & FREELANCE",
+    "emoji": "💼",
+    "domains": [
+      "upwork.com",
+      "fiverr.com",
+      "freelancer.com",
+      "glassdoor.com",
+      "indeed.com",
+      "wellfound.com",
+      "remoteok.com"
+    ]
+  },
+  {
+    "id": "web",
+    "name": "WEB & SEARCH",
+    "emoji": "🔍",
+    "domains": [
+      "brave.com",
+      "search.brave.com",
+      "google.com",
+      "bing.com",
+      "duckduckgo.com",
+      "kagi.com"
+    ]
+  },
+  {
+    "id": "crypto",
+    "name": "TRADING & CRYPTO",
+    "emoji": "📈",
+    "domains": [
+      "tradingview.com",
+      "binance.com",
+      "coinmarketcap.com",
+      "coingecko.com",
+      "bybit.com",
+      "forexfactory.com",
+      "investing.com"
+    ]
+  },
+  {
     "id": "others",
     "name": "OTHERS",
-    "emoji": "\ud83c\udf10",
+    "emoji": "🌐",
     "domains": []
   }
 ]

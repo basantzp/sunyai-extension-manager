@@ -2,6 +2,8 @@ class DomainExtractor {
   static SKIPPED_PROTOCOLS = [
     'chrome://',
     'chrome-extension://',
+    'brave://',
+    'edge://',
     'about:',
     'file://',
     'javascript:',

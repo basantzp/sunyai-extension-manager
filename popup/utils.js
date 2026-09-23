@@ -52,14 +52,23 @@ async function sendMessage(action, payload = {}, useActiveWindow = true, maxRetr
 
       if (useActiveWindow && chrome.windows?.getLastFocused) {
         try {
-          chrome.windows.getLastFocused({ populate: false }, (window) => {
+          chrome.windows.getLastFocused({ populate: false, windowTypes: ['normal'] }, (window) => {
             if (!chrome.runtime.lastError && window?.id) {
               message.windowId = window.id;
             }
             sendWithFallback(message);
           });
         } catch {
-          sendWithFallback(message);
+          try {
+            chrome.windows.getLastFocused({ populate: false }, (window) => {
+              if (!chrome.runtime.lastError && window?.id) {
+                message.windowId = window.id;
+              }
+              sendWithFallback(message);
+            });
+          } catch {
+            sendWithFallback(message);
+          }
         }
       } else {
         sendWithFallback(message);
